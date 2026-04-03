@@ -79,7 +79,7 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
         {/* Image carousel */}
         <div
           className="w-full flex items-center justify-center overflow-hidden relative"
-          style={{ height: 260, backgroundColor: imgBg }}
+          style={{ height: 340, backgroundColor: '#FFF8FA' }}
         >
           {images.length > 0 ? (
             <>
@@ -87,7 +87,8 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
               <img
                 src={images[imgIndex]}
                 alt={`${product.name} ${imgIndex + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full"
+                style={{ objectFit: 'contain' }}
               />
               {images.length > 1 && (
                 <>
@@ -134,57 +135,68 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
         </div>
 
         {/* Details */}
-        <div className="p-6 flex flex-col gap-4">
-          <div>
-            <h2 className="text-xl font-bold text-[#180A10] leading-snug">{product.name}</h2>
-            <p className="text-[#C85880] font-bold text-2xl mt-1">
+        <div className="p-5 flex flex-col gap-3">
+          <h2 className="text-lg font-bold text-[#180A10] leading-snug">{product.name}</h2>
+
+          {/* Sizes + colors + price in one row */}
+          <div className="flex items-center gap-3">
+            {/* Sizes */}
+            <div className="flex flex-col gap-1 flex-1">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-[#180A10]/40">Talla</p>
+              <div className="flex gap-1.5 flex-wrap">
+                {product.sizes.map(size => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors ${
+                      selectedSize === size
+                        ? 'border-[#C85880] bg-[#C85880] text-white'
+                        : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Colors */}
+            <div className="flex flex-col gap-1">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-[#180A10]/40">
+                Color
+              </p>
+              <div className="flex gap-1.5 flex-wrap">
+                {product.colors.map(color => (
+                  <button
+                    key={color}
+                    onClick={() => setSelectedColor(color)}
+                    title={COLOR_LABELS[color] ?? color}
+                    className={`w-6 h-6 rounded-full border-2 transition-all ${
+                      selectedColor === color
+                        ? 'border-[#C85880] scale-110'
+                        : 'border-[#F0D4DC] hover:border-[#C85880]'
+                    }`}
+                    style={{
+                      backgroundColor: color,
+                      boxShadow: color === '#ffffff' ? 'inset 0 0 0 1px #e5c8d0' : undefined,
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Price */}
+            <p
+              style={{
+                fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
+                fontWeight: 700,
+                fontSize: 20,
+                color: '#C85880',
+                flexShrink: 0,
+              }}
+            >
               S/ {product.price.toFixed(2)}
             </p>
-          </div>
-
-          {/* Sizes */}
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#180A10]/40 mb-2">Talla</p>
-            <div className="flex gap-2 flex-wrap">
-              {product.sizes.map(size => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-colors ${
-                    selectedSize === size
-                      ? 'border-[#C85880] bg-[#C85880] text-white'
-                      : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Colors */}
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#180A10]/40 mb-2">
-              Color{selectedColor ? ` — ${COLOR_LABELS[selectedColor] ?? selectedColor}` : ''}
-            </p>
-            <div className="flex gap-2 flex-wrap">
-              {product.colors.map(color => (
-                <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  title={COLOR_LABELS[color] ?? color}
-                  className={`w-7 h-7 rounded-full border-2 transition-all ${
-                    selectedColor === color
-                      ? 'border-[#C85880] scale-110'
-                      : 'border-[#F0D4DC] hover:border-[#C85880]'
-                  }`}
-                  style={{
-                    backgroundColor: color,
-                    boxShadow: color === '#ffffff' ? 'inset 0 0 0 1px #e5c8d0' : undefined,
-                  }}
-                />
-              ))}
-            </div>
           </div>
 
           <button
