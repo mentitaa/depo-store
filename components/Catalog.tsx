@@ -10,7 +10,7 @@ import FilterModal, { type FilterValues } from './FilterModal'
 const CATEGORIES: { label: string; value: Category | 'todos' }[] = [
   { label: 'Todos', value: 'todos' },
   { label: 'Vestidos', value: 'vestidos' },
-  { label: 'Deportiva', value: 'deportiva' },
+  { label: 'Deportivo', value: 'deportiva' },
   { label: 'Casual', value: 'casual' },
 ]
 
@@ -146,7 +146,7 @@ export default function Catalog({ initialProducts = DEMO_PRODUCTS }: Props) {
                 color: '#C85880',
               }}
             >
-              // catalogo.filter()
+              // catálogo
             </span>
           </div>
 
@@ -169,7 +169,7 @@ export default function Catalog({ initialProducts = DEMO_PRODUCTS }: Props) {
             }}
           >
             <SlidersHorizontal size={12} />
-            filtrar()
+            filtrar
             {hasActiveFilters && (
               <span
                 style={{

@@ -31,7 +31,7 @@ export default function Navbar() {
           className="hidden sm:block transition-opacity hover:opacity-70"
           style={{ ...MONO, fontSize: 13, fontWeight: 700, color: '#C85880' }}
         >
-          // faq
+          // ¿tienes dudas?
         </Link>
 
         <button

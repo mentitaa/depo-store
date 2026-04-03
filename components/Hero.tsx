@@ -81,7 +81,7 @@ export default function Hero() {
             margin: 0,
           }}
         >
-          Mi DEPO 📦
+          Mi DEPO📦
         </h1>
 
         {/* Rack animation */}
@@ -144,7 +144,7 @@ export default function Hero() {
         <p
           style={{
             fontFamily: MONO,
-            fontSize: 12,
+            fontSize: 15,
             color: '#C85880',
             margin: 0,
             lineHeight: 1.5,

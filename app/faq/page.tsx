@@ -102,7 +102,7 @@ export default function FaqPage() {
                 letterSpacing: '0.03em',
               }}
             >
-              // preguntas frecuentes
+              // ¿tienes dudas?
             </span>
           </div>
 
