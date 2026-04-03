@@ -1,26 +1,55 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  --color-bg: #FFF8FA;
+  --color-accent: #C85880;
+  --color-border-soft: #F0D4DC;
+  --color-card: #ffffff;
+  --color-text: #180A10;
+  --color-accent-hover: #a8446a;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FFF8FA;
+  color: #180A10;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Rack / garment hang-in animation */
+@keyframes hangIn {
+  from {
+    opacity: 0;
+    transform: translateY(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.garment {
+  animation: hangIn 0.5s ease forwards;
+  opacity: 0;
+}
+.garment:nth-child(1) { animation-delay: 0.2s; }
+.garment:nth-child(2) { animation-delay: 0.5s; }
+.garment:nth-child(3) { animation-delay: 0.8s; }
+.garment:nth-child(4) { animation-delay: 1.1s; }
+.garment:nth-child(5) { animation-delay: 1.4s; }
+.garment:nth-child(6) { animation-delay: 1.7s; }
+
+/* Cart drawer slide-in (width transition, NOT position fixed) */
+.cart-drawer {
+  width: 0;
+  overflow: hidden;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+.cart-drawer.open {
+  width: 360px;
+}
+@media (max-width: 480px) {
+  .cart-drawer.open {
+    width: 100vw;
+  }
 }

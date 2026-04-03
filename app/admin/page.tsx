@@ -1,0 +1,445 @@
+'use client'
+
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase, updateOrderStatus, createProduct, uploadProductImage } from '@/lib/supabase'
+import type { Order, Product, Category } from '@/lib/types'
+import { PackageCheck, Plus, LogOut, RefreshCw, Upload, X } from 'lucide-react'
+
+const SIZES_OPTIONS = ['XS', 'S', 'M', 'L', 'XL']
+const COLOR_OPTIONS = [
+  { value: '#000000', label: 'Negro' },
+  { value: '#ffffff', label: 'Blanco' },
+  { value: '#C85880', label: 'Rosa' },
+  { value: '#3B5998', label: 'Azul' },
+  { value: '#8B4513', label: 'Marrón' },
+  { value: '#228B22', label: 'Verde' },
+  { value: '#FF6347', label: 'Rojo' },
+  { value: '#FFD700', label: 'Dorado' },
+]
+const CATEGORIES: Category[] = ['vestidos', 'deportiva', 'casual']
+
+function toggle<T>(arr: T[], val: T): T[] {
+  return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val]
+}
+
+// ─── Add Product Form (right column) ─────────────────────────────────────────
+
+function AddProductForm({ onAdded }: { onAdded: () => void }) {
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [loading, setLoading] = useState(false)
+  const [success, setSuccess] = useState(false)
+  const [formError, setFormError] = useState('')
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState('')
+  const [form, setForm] = useState({
+    name: '',
+    category: 'casual' as Category,
+    price: '',
+    stock: '1',
+  })
+  const [sizes, setSizes] = useState<string[]>([])
+  const [colors, setColors] = useState<string[]>([])
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+  }
+
+  function removeImage() {
+    setImageFile(null)
+    setImagePreview('')
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setFormError('')
+    if (sizes.length === 0) { setFormError('Selecciona al menos una talla.'); return }
+    if (colors.length === 0) { setFormError('Selecciona al menos un color.'); return }
+
+    setLoading(true)
+    try {
+      let imageUrl = ''
+      if (imageFile) {
+        imageUrl = await uploadProductImage(imageFile)
+      }
+
+      await createProduct({
+        name: form.name,
+        category: form.category,
+        price: parseFloat(form.price),
+        image_url: imageUrl,
+        stock: parseInt(form.stock),
+        sizes,
+        colors,
+      })
+
+      // Reset
+      setForm({ name: '', category: 'casual', price: '', stock: '1' })
+      setSizes([])
+      setColors([])
+      setImageFile(null)
+      setImagePreview('')
+      if (fileRef.current) fileRef.current.value = ''
+      setSuccess(true)
+      setTimeout(() => setSuccess(false), 3000)
+      onAdded()
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : 'Error al guardar el producto.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-2xl border border-[#F0D4DC] p-5 flex flex-col gap-5 sticky top-6">
+      <div className="flex items-center gap-2">
+        <Plus size={16} className="text-[#C85880]" />
+        <h2 className="text-sm font-bold text-[#180A10]">Nuevo producto</h2>
+      </div>
+
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+        {/* Image upload */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-[#180A10]/50 font-medium">Foto del producto</label>
+          {imagePreview ? (
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-[#F0D4DC]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={removeImage}
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center hover:bg-[#F0D4DC] transition-colors"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              className="w-full aspect-[4/3] rounded-xl border-2 border-dashed border-[#F0D4DC] flex flex-col items-center justify-center gap-2 hover:border-[#C85880] transition-colors group"
+            >
+              <Upload size={20} className="text-[#180A10]/30 group-hover:text-[#C85880] transition-colors" />
+              <span className="text-xs text-[#180A10]/40 group-hover:text-[#C85880] transition-colors">
+                Subir imagen
+              </span>
+            </button>
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageChange}
+          />
+        </div>
+
+        {/* Name */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#180A10]/50 font-medium">Nombre</label>
+          <input
+            type="text" required
+            value={form.name}
+            onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+            placeholder="Vestido floral primavera"
+            className="px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA]"
+          />
+        </div>
+
+        {/* Category + Price in row */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-[#180A10]/50 font-medium">Categoría</label>
+            <select
+              value={form.category}
+              onChange={e => setForm(p => ({ ...p, category: e.target.value as Category }))}
+              className="px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA]"
+            >
+              {CATEGORIES.map(c => (
+                <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-xs text-[#180A10]/50 font-medium">Precio (S/)</label>
+            <input
+              type="number" required min="0" step="0.01"
+              value={form.price}
+              onChange={e => setForm(p => ({ ...p, price: e.target.value }))}
+              placeholder="89.90"
+              className="px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA]"
+            />
+          </div>
+        </div>
+
+        {/* Stock */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#180A10]/50 font-medium">Stock disponible</label>
+          <input
+            type="number" required min="0"
+            value={form.stock}
+            onChange={e => setForm(p => ({ ...p, stock: e.target.value }))}
+            className="px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA]"
+          />
+        </div>
+
+        {/* Sizes */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-[#180A10]/50 font-medium">Tallas</label>
+          <div className="flex gap-2 flex-wrap">
+            {SIZES_OPTIONS.map(s => (
+              <button
+                key={s} type="button"
+                onClick={() => setSizes(prev => toggle(prev, s))}
+                className={`px-3 py-1 rounded-lg border text-sm transition-colors ${
+                  sizes.includes(s)
+                    ? 'border-[#C85880] bg-[#C85880] text-white'
+                    : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
+                }`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Colors */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-[#180A10]/50 font-medium">Colores</label>
+          <div className="flex gap-2 flex-wrap">
+            {COLOR_OPTIONS.map(({ value, label }) => (
+              <button
+                key={value} type="button"
+                onClick={() => setColors(prev => toggle(prev, value))}
+                title={label}
+                style={{
+                  backgroundColor: value,
+                  boxShadow: value === '#ffffff' ? 'inset 0 0 0 1px #e5c8d0' : undefined,
+                }}
+                className={`w-7 h-7 rounded-full border-2 transition-all ${
+                  colors.includes(value)
+                    ? 'border-[#C85880] scale-110'
+                    : 'border-[#F0D4DC] hover:border-[#C85880]'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {formError && (
+          <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2">{formError}</p>
+        )}
+        {success && (
+          <p className="text-xs text-green-700 bg-green-50 rounded-lg px-3 py-2">
+            ✓ Producto agregado correctamente.
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 rounded-full bg-[#C85880] text-white font-semibold text-sm hover:bg-[#a8446a] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {loading ? 'Guardando…' : 'GUARDAR PRODUCTO'}
+        </button>
+      </form>
+    </div>
+  )
+}
+
+// ─── Main Admin Dashboard ─────────────────────────────────────────────────────
+
+export default function AdminPage() {
+  const router = useRouter()
+  const [checkingAuth, setCheckingAuth] = useState(true)
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loadingOrders, setLoadingOrders] = useState(false)
+
+  // Auth check — redirect to /admin/login if no session
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        router.replace('/admin/login')
+      } else {
+        setCheckingAuth(false)
+      }
+    })
+  }, [router])
+
+  const fetchOrders = useCallback(async () => {
+    setLoadingOrders(true)
+    try {
+      const { data } = await supabase
+        .from('orders')
+        .select('*, product:products(*)')
+        .order('created_at', { ascending: false })
+      setOrders((data as Order[]) ?? [])
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoadingOrders(false)
+    }
+  }, [])
+
+  // Load + realtime subscription
+  useEffect(() => {
+    if (checkingAuth) return
+    fetchOrders()
+
+    const channel = supabase
+      .channel('orders-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, fetchOrders)
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [checkingAuth, fetchOrders])
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    router.replace('/admin/login')
+  }
+
+  async function handleMarkSent(id: string) {
+    await updateOrderStatus(id, 'enviado')
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: 'enviado' } : o))
+  }
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center bg-[#FFF8FA]">
+        <div className="w-8 h-8 border-2 border-[#C85880] border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  const pendingCount = orders.filter(o => o.status === 'pendiente').length
+
+  return (
+    <div className="min-h-dvh bg-[#FFF8FA]">
+      {/* Header */}
+      <header className="bg-white border-b border-[#F0D4DC] px-6 py-4 flex items-center justify-between sticky top-0 z-20">
+        <div className="flex items-center gap-3">
+          <span
+            className="text-xl tracking-[0.3em] text-[#180A10] select-none"
+            style={{ fontFamily: 'Georgia, serif' }}
+          >
+            DEPO
+          </span>
+          <span className="text-[11px] text-[#180A10]/40 border border-[#F0D4DC] rounded-full px-2 py-0.5">
+            Admin
+          </span>
+          {pendingCount > 0 && (
+            <span className="text-[11px] bg-[#C85880] text-white rounded-full px-2 py-0.5 font-bold">
+              {pendingCount} pendiente{pendingCount > 1 ? 's' : ''}
+            </span>
+          )}
+        </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-1.5 text-sm text-[#180A10]/50 hover:text-[#C85880] transition-colors"
+        >
+          <LogOut size={15} />
+          Cerrar sesión
+        </button>
+      </header>
+
+      {/* Two-column layout */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+
+        {/* ── LEFT: Orders ──────────────────────────────────── */}
+        <div>
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-3 mb-6">
+            {[
+              { label: 'Total pedidos', value: orders.length },
+              { label: 'Pendientes',    value: pendingCount,                                    highlight: pendingCount > 0 },
+              { label: 'Enviados',      value: orders.filter(o => o.status === 'enviado').length },
+            ].map(stat => (
+              <div
+                key={stat.label}
+                className={`bg-white rounded-2xl border p-4 ${stat.highlight ? 'border-[#C85880]' : 'border-[#F0D4DC]'}`}
+              >
+                <p className="text-2xl font-bold text-[#180A10]">{stat.value}</p>
+                <p className="text-xs text-[#180A10]/50 mt-0.5">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Orders header */}
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-bold text-[#180A10]">Pedidos en tiempo real</h2>
+            <button
+              onClick={fetchOrders}
+              disabled={loadingOrders}
+              className="flex items-center gap-1.5 text-xs text-[#180A10]/50 hover:text-[#C85880] transition-colors"
+            >
+              <RefreshCw size={13} className={loadingOrders ? 'animate-spin' : ''} />
+              Actualizar
+            </button>
+          </div>
+
+          {orders.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-[#F0D4DC] p-12 text-center text-[#180A10]/40 text-sm">
+              No hay pedidos aún.
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {orders.map(order => (
+                <div
+                  key={order.id}
+                  className={`bg-white rounded-2xl border p-4 flex flex-col sm:flex-row sm:items-center gap-3 transition-opacity ${
+                    order.status === 'enviado' ? 'opacity-50 border-[#F0D4DC]' : 'border-[#F0D4DC]'
+                  }`}
+                >
+                  {/* Badge */}
+                  <span className={`self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide flex-shrink-0 ${
+                    order.status === 'pendiente'
+                      ? 'bg-[#FFF0F4] text-[#C85880] border border-[#C85880]'
+                      : 'bg-[#F0D4DC] text-[#180A10]/50'
+                  }`}>
+                    {order.status}
+                  </span>
+
+                  {/* Details */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-[#180A10]">{order.customer_name}</p>
+                    <p className="text-xs text-[#180A10]/50 mt-0.5">
+                      {(order.product as Product | undefined)?.name ?? '—'} — Talla {order.size}
+                    </p>
+                    <p className="text-xs text-[#180A10]/40 mt-0.5 line-clamp-1">{order.address}</p>
+                    <p className="text-xs text-[#180A10]/40">{order.phone}</p>
+                  </div>
+
+                  {/* Date */}
+                  <p className="text-[11px] text-[#180A10]/30 flex-shrink-0">
+                    {new Date(order.created_at).toLocaleDateString('es-PE', {
+                      day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+                    })}
+                  </p>
+
+                  {order.status === 'pendiente' && (
+                    <button
+                      onClick={() => handleMarkSent(order.id)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#C85880] text-white text-xs font-semibold hover:bg-[#a8446a] transition-colors flex-shrink-0"
+                    >
+                      <PackageCheck size={13} />
+                      Marcar enviado
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ── RIGHT: Add product form ──────────────────────── */}
+        <AddProductForm onAdded={fetchOrders} />
+      </div>
+    </div>
+  )
+}
