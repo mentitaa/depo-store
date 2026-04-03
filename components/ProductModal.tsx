@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import type { Product } from '@/lib/types'
 import { useCart } from '@/context/CartContext'
 
@@ -22,7 +22,6 @@ const COLOR_LABELS: Record<string, string> = {
   '#FFD700': 'Dorado',
 }
 
-// Subtle background tint per category for the image area
 const CATEGORY_BG: Record<string, string> = {
   vestidos:  '#F9E8EF',
   deportiva: '#E8F0F9',
@@ -33,6 +32,7 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
   const { addItem, openCart } = useCart()
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] ?? '')
   const [selectedColor, setSelectedColor] = useState(product.colors[0] ?? '')
+  const [imgIndex, setImgIndex] = useState(0)
 
   if (!isOpen) return null
 
@@ -42,7 +42,15 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
     openCart()
   }
 
+  const images = product.image_urls ?? []
   const imgBg = CATEGORY_BG[product.category] ?? '#F0D4DC'
+
+  function prev() {
+    setImgIndex(i => (i === 0 ? images.length - 1 : i - 1))
+  }
+  function next() {
+    setImgIndex(i => (i === images.length - 1 ? 0 : i + 1))
+  }
 
   return (
     <div
@@ -54,7 +62,7 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
         className="relative bg-white rounded-2xl shadow-2xl border border-[#F0D0D8] max-w-md w-full overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        {/* Close — top-left, circular, semi-transparent */}
+        {/* Close */}
         <button
           onClick={onClose}
           aria-label="Cerrar"
@@ -68,18 +76,58 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
           EN STOCK
         </div>
 
-        {/* Image — 260px, category-tinted background */}
+        {/* Image carousel */}
         <div
-          className="w-full flex items-center justify-center overflow-hidden"
+          className="w-full flex items-center justify-center overflow-hidden relative"
           style={{ height: 260, backgroundColor: imgBg }}
         >
-          {product.image_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
+          {images.length > 0 ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={images[imgIndex]}
+                alt={`${product.name} ${imgIndex + 1}`}
+                className="w-full h-full object-cover"
+              />
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={prev}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow-sm transition-colors"
+                    aria-label="Imagen anterior"
+                  >
+                    <ChevronLeft size={16} className="text-[#180A10]" />
+                  </button>
+                  <button
+                    onClick={next}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center shadow-sm transition-colors"
+                    aria-label="Imagen siguiente"
+                  >
+                    <ChevronRight size={16} className="text-[#180A10]" />
+                  </button>
+                  {/* Dot indicators */}
+                  <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
+                    {images.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setImgIndex(i)}
+                        aria-label={`Ver imagen ${i + 1}`}
+                        style={{
+                          width: i === imgIndex ? 16 : 6,
+                          height: 6,
+                          borderRadius: 3,
+                          background: i === imgIndex ? '#C85880' : 'rgba(255,255,255,0.7)',
+                          transition: 'all 0.2s',
+                          border: 'none',
+                          padding: 0,
+                          cursor: 'pointer',
+                        }}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
           ) : (
             <span className="text-7xl select-none">👗</span>
           )}

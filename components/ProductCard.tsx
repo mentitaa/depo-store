@@ -15,10 +15,10 @@ export default function ProductCard({ product, onClick }: Props) {
     >
       {/* Image */}
       <div className="w-full aspect-[3/4] bg-[#F0D4DC] overflow-hidden flex items-center justify-center relative">
-        {product.image_url ? (
+        {product.image_urls?.[0] ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={product.image_url}
+            src={product.image_urls[0]}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />

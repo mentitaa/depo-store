@@ -164,9 +164,9 @@ export default function CheckoutPage() {
                     >
                       {/* Thumb */}
                       <div className="w-12 h-14 rounded-lg overflow-hidden bg-[#F9E8EF] flex-shrink-0 flex items-center justify-center">
-                        {item.product.image_url ? (
+                        {item.product.image_urls?.[0] ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover" />
+                          <img src={item.product.image_urls[0]} alt={item.product.name} className="w-full h-full object-cover" />
                         ) : (
                           <span className="text-xl">👗</span>
                         )}

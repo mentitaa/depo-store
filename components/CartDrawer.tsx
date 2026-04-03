@@ -81,10 +81,10 @@ export default function CartDrawer() {
                     className="rounded-xl overflow-hidden bg-[#F9E8EF] flex-shrink-0 flex items-center justify-center"
                     style={{ width: 56, height: 72 }}
                   >
-                    {item.product.image_url ? (
+                    {item.product.image_urls?.[0] ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
-                        src={item.product.image_url}
+                        src={item.product.image_urls[0]}
                         alt={item.product.name}
                         className="w-full h-full object-cover"
                       />

@@ -7,7 +7,7 @@ export interface Product {
   price: number
   sizes: string[]
   colors: string[]
-  image_url: string
+  image_urls: string[]
   stock: number
   created_at: string
 }

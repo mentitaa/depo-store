@@ -16,7 +16,7 @@ create table if not exists products (
   price       numeric(10, 2) not null check (price >= 0),
   sizes       text[] not null default '{}',
   colors      text[] not null default '{}',
-  image_url   text not null default '',
+  image_urls  text[] not null default '{}',
   stock       integer not null default 0 check (stock >= 0),
   created_at  timestamptz not null default now()
 );

@@ -30,8 +30,8 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [formError, setFormError] = useState('')
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState('')
+  const [imageFiles, setImageFiles] = useState<File[]>([])
+  const [imagePreviews, setImagePreviews] = useState<string[]>([])
   const [form, setForm] = useState({
     name: '',
     category: 'casual' as Category,
@@ -42,16 +42,18 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
   const [colors, setColors] = useState<string[]>([])
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setImageFile(file)
-    setImagePreview(URL.createObjectURL(file))
+    const files = Array.from(e.target.files ?? [])
+    if (files.length === 0) return
+    const remaining = 4 - imageFiles.length
+    const toAdd = files.slice(0, remaining)
+    setImageFiles(prev => [...prev, ...toAdd])
+    setImagePreviews(prev => [...prev, ...toAdd.map(f => URL.createObjectURL(f))])
+    if (fileRef.current) fileRef.current.value = ''
   }
 
-  function removeImage() {
-    setImageFile(null)
-    setImagePreview('')
-    if (fileRef.current) fileRef.current.value = ''
+  function removeImage(index: number) {
+    setImageFiles(prev => prev.filter((_, i) => i !== index))
+    setImagePreviews(prev => prev.filter((_, i) => i !== index))
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -62,16 +64,13 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
 
     setLoading(true)
     try {
-      let imageUrl = ''
-      if (imageFile) {
-        imageUrl = await uploadProductImage(imageFile)
-      }
+      const imageUrls = await Promise.all(imageFiles.map(f => uploadProductImage(f)))
 
       await createProduct({
         name: form.name,
         category: form.category,
         price: parseFloat(form.price),
-        image_url: imageUrl,
+        image_urls: imageUrls,
         stock: parseInt(form.stock),
         sizes,
         colors,
@@ -81,9 +80,8 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
       setForm({ name: '', category: 'casual', price: '', stock: '1' })
       setSizes([])
       setColors([])
-      setImageFile(null)
-      setImagePreview('')
-      if (fileRef.current) fileRef.current.value = ''
+      setImageFiles([])
+      setImagePreviews([])
       setSuccess(true)
       setTimeout(() => setSuccess(false), 3000)
       onAdded()
@@ -103,37 +101,43 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-        {/* Image upload */}
+        {/* Image upload — up to 4 images */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs text-[#180A10]/50 font-medium">Foto del producto</label>
-          {imagePreview ? (
-            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-[#F0D4DC]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+          <label className="text-xs text-[#180A10]/50 font-medium">
+            Fotos del producto ({imagePreviews.length}/4)
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {imagePreviews.map((src, i) => (
+              <div key={i} className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F0D4DC]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removeImage(i)}
+                  className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center hover:bg-[#F0D4DC] transition-colors"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+            {imagePreviews.length < 4 && (
               <button
                 type="button"
-                onClick={removeImage}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center hover:bg-[#F0D4DC] transition-colors"
+                onClick={() => fileRef.current?.click()}
+                className="aspect-[4/3] rounded-xl border-2 border-dashed border-[#F0D4DC] flex flex-col items-center justify-center gap-2 hover:border-[#C85880] transition-colors group"
               >
-                <X size={12} />
+                <Upload size={18} className="text-[#180A10]/30 group-hover:text-[#C85880] transition-colors" />
+                <span className="text-xs text-[#180A10]/40 group-hover:text-[#C85880] transition-colors">
+                  Agregar
+                </span>
               </button>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              className="w-full aspect-[4/3] rounded-xl border-2 border-dashed border-[#F0D4DC] flex flex-col items-center justify-center gap-2 hover:border-[#C85880] transition-colors group"
-            >
-              <Upload size={20} className="text-[#180A10]/30 group-hover:text-[#C85880] transition-colors" />
-              <span className="text-xs text-[#180A10]/40 group-hover:text-[#C85880] transition-colors">
-                Subir imagen
-              </span>
-            </button>
-          )}
+            )}
+          </div>
           <input
             ref={fileRef}
             type="file"
             accept="image/*"
+            multiple
             className="hidden"
             onChange={handleImageChange}
           />
