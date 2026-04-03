@@ -66,7 +66,7 @@ export default function ProductCard({ product, onClick }: Props) {
               textTransform: 'lowercase' as const,
             }}
           >
-            {product.category.join(' · ')}
+            {(Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)).join(' · ')}
           </span>
         </div>
 

@@ -529,7 +529,7 @@ export default function AdminPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-[#180A10] line-clamp-1">{p.name}</p>
                       <p className="text-xs text-[#C85880] font-bold">S/ {p.price.toFixed(2)}</p>
-                      <p className="text-[10px] text-[#180A10]/40">{p.category.join(', ')}</p>
+                      <p className="text-[10px] text-[#180A10]/40">{(Array.isArray(p.category) ? p.category : [p.category].filter(Boolean)).join(', ')}</p>
                     </div>
                     {/* Delete */}
                     <button

@@ -43,7 +43,8 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
   }
 
   const images = product.image_urls ?? []
-  const imgBg = CATEGORY_BG[product.category[0]] ?? '#F0D4DC'
+  const categories = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)
+  const imgBg = CATEGORY_BG[categories[0]] ?? '#F0D4DC'
 
   function prev() {
     setImgIndex(i => (i === 0 ? images.length - 1 : i - 1))
