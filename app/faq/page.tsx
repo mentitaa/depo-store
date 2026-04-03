@@ -3,18 +3,29 @@
 import { useState } from 'react'
 import Navbar from '@/components/Navbar'
 
-const FAQS = [
+const FAQS: { q: string; a: React.ReactNode }[] = [
   {
     q: '¿Cuánto tarda el envío?',
     a: 'Te lo entregamos el mismo día. Te contactaremos por WhatsApp y coordinamos la entrega.',
   },
   {
     q: '¿Hacen envíos fuera de Trujillo?',
-    a: 'Sí, a pueblos y ciudades cercanas. En esos casos tomará 1 día adicional.',
+    a: (
+      <span>
+        Sí. Hacemos envíos a las siguientes zonas:<br /><br />
+        <span style={{ display: 'block', marginBottom: 6 }}>
+          <strong>Trujillo y alrededores (mismo día):</strong> Huanchaco, El Milagro, Florencia de Mora, Víctor Larco y Moche.
+        </span>
+        <span style={{ display: 'block', marginBottom: 6 }}>
+          <strong>Valle y provincia (1-2 días vía Tres Ases o Shalom):</strong> Virú, Otuzco, Chocope, Casa Grande, Paiján, Ascope, Pacasmayo y San Pedro de Lloc.
+        </span>
+        ¿No ves tu ciudad? Escríbenos por WhatsApp y coordinamos.
+      </span>
+    ),
   },
   {
     q: '¿Puedo hacer devoluciones?',
-    a: 'No aceptamos devoluciones.',
+    a: 'Cada prenda pasa por revisión antes de salir. No encontrarás fallas — pero si en algún caso excepcional ocurre algo, lo coordinamos contigo en privado. Por temas de gusto o decisión de compra, no realizamos devoluciones.',
   },
   {
     q: '¿Cómo puedo pagar?',
@@ -22,11 +33,19 @@ const FAQS = [
   },
   {
     q: '¿El precio incluye el envío?',
-    a: 'No. Al coordinar la entrega, el pedido se enviará mediante un motorizado de InDriver y pagarás el envío al recibir tu pedido.',
+    a: (
+      <span>
+        No. El envío se cobra aparte según tu ubicación:<br /><br />
+        <span style={{ display: 'block', marginBottom: 6 }}>
+          <strong>Trujillo y alrededores:</strong> el pedido llega mediante un motorizado de InDriver y pagas el costo del envío al recibirlo.
+        </span>
+        <strong>Valle y provincia:</strong> enviamos por Tres Ases o Shalom bajo la modalidad &quot;paga el destinatario&quot;, es decir, cancelas el envío directamente al recoger tu paquete en la agencia.
+      </span>
+    ),
   },
 ]
 
-function FaqRow({ q, a, last }: { q: string; a: string; last: boolean }) {
+function FaqRow({ q, a, last }: { q: string; a: React.ReactNode; last: boolean }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -52,12 +71,12 @@ function FaqRow({ q, a, last }: { q: string; a: string; last: boolean }) {
 
       {open && (
         <div className="px-6 pb-5">
-          <p
+          <div
             className="text-sm leading-relaxed"
             style={{ color: '#C85880' }}
           >
             {a}
-          </p>
+          </div>
         </div>
       )}
     </div>
