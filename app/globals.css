@@ -38,6 +38,10 @@ body {
 .garment:nth-child(5) { animation-delay: 1.4s; }
 .garment:nth-child(6) { animation-delay: 1.7s; }
 
+.hero-cta:hover {
+  background: #a8446a !important;
+}
+
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0; }

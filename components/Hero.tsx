@@ -151,6 +151,7 @@ export default function Hero() {
 
         <a
           href="#catalogo"
+          className="hero-cta"
           style={{
             marginTop: 8,
             padding: '10px 24px',
@@ -164,8 +165,6 @@ export default function Hero() {
             display: 'inline-block',
             transition: 'background 0.2s',
           }}
-          onMouseOver={e => (e.currentTarget.style.background = '#a8446a')}
-          onMouseOut={e => (e.currentTarget.style.background = '#C85880')}
         >
           ver_coleccion() →
         </a>
