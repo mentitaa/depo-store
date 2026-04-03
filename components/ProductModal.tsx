@@ -139,29 +139,17 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
         <div className="p-5 flex flex-col gap-3">
           <h2 className="text-lg font-bold text-[#180A10] leading-snug">{product.name}</h2>
 
-          {/* Price */}
-          <p
-            style={{
-              fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
-              fontWeight: 700,
-              fontSize: 26,
-              color: '#C85880',
-            }}
-          >
-            S/ {product.price.toFixed(2)}
-          </p>
-
-          {/* Sizes + colors in same row */}
-          <div className="flex items-start gap-4">
+          {/* Talla + Color + Precio — one row */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
             {/* Sizes */}
-            <div className="flex flex-col gap-1 flex-1">
+            <div className="flex flex-col gap-1">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-[#180A10]/40">Talla</p>
-              <div className="flex gap-1.5 flex-wrap">
+              <div className="flex gap-1 flex-wrap">
                 {product.sizes.map(size => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors ${
+                    className={`px-2 py-0.5 rounded-lg border text-xs font-medium transition-colors ${
                       selectedSize === size
                         ? 'border-[#C85880] bg-[#C85880] text-white'
                         : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
@@ -197,6 +185,19 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
                 ))}
               </div>
             </div>
+
+            {/* Price */}
+            <p
+              style={{
+                fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
+                fontWeight: 700,
+                fontSize: 26,
+                color: '#C85880',
+                flexShrink: 0,
+              }}
+            >
+              S/ {product.price.toFixed(2)}
+            </p>
           </div>
 
           <button

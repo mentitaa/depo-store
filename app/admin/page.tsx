@@ -157,7 +157,7 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#F0D4DC] p-5 flex flex-col gap-5 sticky top-6">
+    <div className="bg-white rounded-2xl border border-[#F0D4DC] p-5 flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {editing ? <Pencil size={16} className="text-[#C85880]" /> : <Plus size={16} className="text-[#C85880]" />}
@@ -404,10 +404,12 @@ export default function AdminPage() {
 
   const fetchProducts = useCallback(async () => {
     try {
+      console.log('[Admin] Cargando productos...')
       const data = await getProducts()
+      console.log('[Admin] Productos cargados:', data.length, data)
       setProducts(data)
     } catch (err) {
-      console.error(err)
+      console.error('[Admin] Error cargando productos:', err)
     }
   }, [])
 
@@ -588,13 +590,13 @@ export default function AdminPage() {
           <div className="bg-white rounded-2xl border border-[#F0D4DC] p-5 flex flex-col gap-4">
             <h2 className="text-sm font-bold text-[#180A10]">Mis productos ({products.length})</h2>
             {products.length === 0 ? (
-              <p className="text-xs text-[#180A10]/40 text-center py-4">No hay productos cargados.</p>
+              <p className="text-xs text-[#180A10]/40 text-center py-4">No hay productos aún.</p>
             ) : (
               <div className="flex flex-col gap-3">
                 {products.map(p => (
                   <div key={p.id} className="flex items-center gap-3 border border-[#F0D4DC] rounded-xl p-2">
                     {/* Thumbnail */}
-                    <div className="w-12 h-14 rounded-lg overflow-hidden bg-[#FFF8FA] flex-shrink-0 flex items-center justify-center">
+                    <div className="rounded-lg overflow-hidden bg-[#FFF8FA] flex-shrink-0 flex items-center justify-center" style={{ width: 50, height: 62 }}>
                       {p.image_urls?.[0] ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={p.image_urls[0]} alt={p.name} className="w-full h-full object-cover" />
