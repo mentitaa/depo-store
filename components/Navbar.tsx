@@ -9,7 +9,7 @@ function Logo() {
     <Link href="/" className="flex items-center select-none" style={{ height: 40 }}>
       <span
         style={{
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+          fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
           fontWeight: 700,
           fontSize: 22,
           letterSpacing: '0.04em',

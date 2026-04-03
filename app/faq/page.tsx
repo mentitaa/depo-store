@@ -89,7 +89,7 @@ export default function FaqPage() {
                 width: 8,
                 height: 8,
                 borderRadius: '50%',
-                background: '#28C840',
+                background: '#C85880',
                 flexShrink: 0,
                 animation: 'blink 1.2s step-start infinite',
               }}
@@ -98,7 +98,7 @@ export default function FaqPage() {
               style={{
                 fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
                 fontSize: 13,
-                color: '#28C840',
+                color: '#C85880',
                 letterSpacing: '0.03em',
               }}
             >

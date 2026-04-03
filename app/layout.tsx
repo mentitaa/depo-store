@@ -14,14 +14,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body className="min-h-dvh">
         <CartProvider>
-          {/* Flex row so the CartDrawer slides from the right without position:fixed */}
           <div className="flex min-h-dvh">
             <div className="flex-1 min-w-0 flex flex-col">
               {children}
+              <PoweredBy />
             </div>
             <CartDrawer />
           </div>
-          <PoweredBy />
         </CartProvider>
       </body>
     </html>
