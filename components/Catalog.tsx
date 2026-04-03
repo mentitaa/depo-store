@@ -14,81 +14,11 @@ const CATEGORIES: { label: string; value: Category | 'todos' }[] = [
   { label: 'Casual', value: 'casual' },
 ]
 
-// Demo products so the page renders without Supabase connected
-const DEMO_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    name: 'Vestido Floral Primavera',
-    category: 'vestidos',
-    price: 89.90,
-    sizes: ['S', 'M', 'L'],
-    colors: ['#C85880', '#ffffff', '#FFD700'],
-    image_urls: [],
-    stock: 5,
-    created_at: '',
-  },
-  {
-    id: '2',
-    name: 'Set Deportivo Premium',
-    category: 'deportiva',
-    price: 120.00,
-    sizes: ['XS', 'S', 'M', 'L', 'XL'],
-    colors: ['#000000', '#C85880', '#3B5998'],
-    image_urls: [],
-    stock: 3,
-    created_at: '',
-  },
-  {
-    id: '3',
-    name: 'Blusa Casual Lino',
-    category: 'casual',
-    price: 55.50,
-    sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['#ffffff', '#FFD700', '#8B4513'],
-    image_urls: [],
-    stock: 8,
-    created_at: '',
-  },
-  {
-    id: '4',
-    name: 'Mini Vestido Satinado',
-    category: 'vestidos',
-    price: 110.00,
-    sizes: ['XS', 'S', 'M'],
-    colors: ['#000000', '#C85880'],
-    image_urls: [],
-    stock: 2,
-    created_at: '',
-  },
-  {
-    id: '5',
-    name: 'Jogger Oversize',
-    category: 'deportiva',
-    price: 75.00,
-    sizes: ['S', 'M', 'L', 'XL'],
-    colors: ['#000000', '#228B22', '#3B5998'],
-    image_urls: [],
-    stock: 6,
-    created_at: '',
-  },
-  {
-    id: '6',
-    name: 'Camisa Oversized Casual',
-    category: 'casual',
-    price: 65.00,
-    sizes: ['M', 'L', 'XL'],
-    colors: ['#ffffff', '#8B4513', '#3B5998'],
-    image_urls: [],
-    stock: 4,
-    created_at: '',
-  },
-]
-
 interface Props {
   initialProducts?: Product[]
 }
 
-export default function Catalog({ initialProducts = DEMO_PRODUCTS }: Props) {
+export default function Catalog({ initialProducts = [] }: Props) {
   const [activeCategory, setActiveCategory] = useState<Category | 'todos'>('todos')
   const [filters, setFilters] = useState<FilterValues>({ sizes: [], colors: [] })
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)

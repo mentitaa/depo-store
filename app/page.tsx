@@ -19,7 +19,7 @@ export default async function HomePage() {
       <Navbar />
       <main className="flex-1">
         <Hero />
-        <Catalog initialProducts={products.length > 0 ? products : undefined} />
+        <Catalog initialProducts={products} />
       </main>
     </>
   )
