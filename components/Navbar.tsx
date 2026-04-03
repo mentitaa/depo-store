@@ -4,24 +4,8 @@ import Link from 'next/link'
 import { ShoppingBag } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 
-function Logo() {
-  return (
-    <Link href="/" className="flex items-center select-none" style={{ height: 40 }}>
-      <span
-        style={{
-          fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
-          fontWeight: 700,
-          fontSize: 22,
-          letterSpacing: '0.04em',
-          color: '#180A10',
-          lineHeight: 1,
-        }}
-      >
-        Mi DEPO
-      </span>
-      <span style={{ fontSize: 26, marginLeft: 7, lineHeight: 1 }}>📦</span>
-    </Link>
-  )
+const MONO: React.CSSProperties = {
+  fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
 }
 
 export default function Navbar() {
@@ -32,14 +16,22 @@ export default function Navbar() {
       className="sticky top-0 z-40 flex items-center justify-between px-6 bg-[#FFF8FA] border-b border-[#F0D4DC]"
       style={{ height: 56, backdropFilter: 'blur(8px)' }}
     >
-      <Logo />
+      {/* Logo */}
+      <Link href="/" className="flex items-center gap-1.5 select-none" style={{ height: 40 }}>
+        <span style={{ ...MONO, fontWeight: 700, fontSize: 15, color: '#180A10', lineHeight: 1 }}>
+          Mi DEPO
+        </span>
+        <span style={{ fontSize: 17, lineHeight: 1 }}>📦</span>
+      </Link>
 
+      {/* Right: FAQ + cart */}
       <div className="flex items-center gap-4">
         <Link
           href="/faq"
-          className="text-sm text-[#180A10]/50 hover:text-[#C85880] transition-colors hidden sm:block"
+          className="hidden sm:block transition-opacity hover:opacity-70"
+          style={{ ...MONO, fontSize: 13, fontWeight: 700, color: '#C85880' }}
         >
-          FAQ
+          // faq
         </Link>
 
         <button

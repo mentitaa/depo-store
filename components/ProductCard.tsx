@@ -34,6 +34,30 @@ export default function ProductCard({ product, onClick }: Props) {
 
       {/* Info */}
       <div className="p-3 flex flex-col gap-1">
+        {/* Category badge */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 2 }}>
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: '#C85880',
+              flexShrink: 0,
+              display: 'inline-block',
+            }}
+          />
+          <span
+            style={{
+              fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
+              fontWeight: 700,
+              fontSize: 10,
+              color: '#C85880',
+              textTransform: 'lowercase' as const,
+            }}
+          >
+            {product.category}
+          </span>
+        </div>
         <p className="text-sm font-semibold text-[#180A10] leading-snug line-clamp-2">{product.name}</p>
         <div className="flex items-center gap-1 flex-wrap">
           {product.sizes.slice(0, 4).map(s => (
@@ -52,7 +76,17 @@ export default function ProductCard({ product, onClick }: Props) {
             />
           ))}
         </div>
-        <p className="text-[#C85880] font-bold text-base mt-1">S/ {product.price.toFixed(2)}</p>
+        <p
+          style={{
+            fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
+            fontWeight: 700,
+            fontSize: 14,
+            color: '#C85880',
+            marginTop: 4,
+          }}
+        >
+          S/ {product.price.toFixed(2)}
+        </p>
       </div>
     </button>
   )

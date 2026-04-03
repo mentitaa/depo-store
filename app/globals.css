@@ -38,6 +38,11 @@ body {
 .garment:nth-child(5) { animation-delay: 1.4s; }
 .garment:nth-child(6) { animation-delay: 1.7s; }
 
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
 /* Cart drawer slide-in (width transition, NOT position fixed) */
 .cart-drawer {
   width: 0;

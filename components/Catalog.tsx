@@ -103,62 +103,146 @@ export default function Catalog({ initialProducts = DEMO_PRODUCTS }: Props) {
 
   const hasActiveFilters = filters.sizes.length > 0 || filters.colors.length > 0
 
+  const MONO = 'ui-monospace, "Cascadia Code", "Fira Code", monospace'
+
   return (
     <section id="catalogo" className="px-4 sm:px-6 pb-16">
-      {/* Section header */}
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xl font-bold text-[#180A10] tracking-tight">Catálogo</h2>
-        <button
-          onClick={() => setShowFilters(true)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-colors ${
-            hasActiveFilters
-              ? 'border-[#C85880] bg-[#C85880] text-white'
-              : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
-          }`}
+      {/* Card container */}
+      <div
+        style={{
+          border: '1px solid #F0D4DC',
+          borderRadius: 12,
+          overflow: 'hidden',
+          marginBottom: 0,
+        }}
+      >
+        {/* Dark header */}
+        <div
+          style={{
+            background: '#180A10',
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
         >
-          <SlidersHorizontal size={14} />
-          Filtrar
-          {hasActiveFilters && (
-            <span className="ml-0.5 bg-white text-[#C85880] rounded-full text-[10px] font-bold w-4 h-4 flex items-center justify-center">
-              {filters.sizes.length + filters.colors.length}
-            </span>
-          )}
-        </button>
-      </div>
-
-      {/* Category pills */}
-      <div className="flex gap-2 flex-wrap mb-6">
-        {CATEGORIES.map(cat => (
-          <button
-            key={cat.value}
-            onClick={() => setActiveCategory(cat.value)}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-              activeCategory === cat.value
-                ? 'bg-[#180A10] text-white border-[#180A10]'
-                : 'bg-white text-[#180A10] border-[#F0D4DC] hover:border-[#C85880]'
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Grid */}
-      {filtered.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-          {filtered.map(product => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onClick={() => setSelectedProduct(product)}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: '#C85880',
+                display: 'inline-block',
+                animation: 'blink 1.2s step-start infinite',
+                flexShrink: 0,
+              }}
             />
+            <span
+              style={{
+                fontFamily: MONO,
+                fontWeight: 700,
+                fontSize: 13,
+                color: '#C85880',
+              }}
+            >
+              // catalogo.filter()
+            </span>
+          </div>
+
+          {/* Filtrar button */}
+          <button
+            onClick={() => setShowFilters(true)}
+            style={{
+              fontFamily: MONO,
+              fontWeight: 700,
+              fontSize: 12,
+              color: hasActiveFilters ? '#ffffff' : '#C85880',
+              background: hasActiveFilters ? '#C85880' : 'transparent',
+              border: `1px solid ${hasActiveFilters ? '#C85880' : '#3A1A24'}`,
+              borderRadius: 6,
+              padding: '4px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              cursor: 'pointer',
+            }}
+          >
+            <SlidersHorizontal size={12} />
+            filtrar()
+            {hasActiveFilters && (
+              <span
+                style={{
+                  background: '#ffffff',
+                  color: '#C85880',
+                  borderRadius: '50%',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  width: 16,
+                  height: 16,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {filters.sizes.length + filters.colors.length}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Category buttons */}
+        <div
+          style={{
+            padding: '12px 16px',
+            display: 'flex',
+            gap: 8,
+            flexWrap: 'wrap' as const,
+            borderBottom: '1px solid #F0D4DC',
+            background: '#ffffff',
+          }}
+        >
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat.value}
+              onClick={() => setActiveCategory(cat.value)}
+              style={{
+                fontFamily: MONO,
+                fontWeight: 700,
+                fontSize: 12,
+                padding: '5px 14px',
+                borderRadius: 6,
+                border: activeCategory === cat.value ? '1px solid #C85880' : '1px solid #F0D4DC',
+                background: activeCategory === cat.value ? '#C85880' : '#ffffff',
+                color: activeCategory === cat.value ? '#ffffff' : '#180A10',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}
+            >
+              {cat.label.toLowerCase()}
+            </button>
           ))}
         </div>
-      ) : (
-        <div className="py-16 text-center text-[#180A10]/40 text-sm">
-          No hay productos con estos filtros.
+
+        {/* Grid */}
+        <div style={{ padding: '16px', background: '#ffffff' }}>
+          {filtered.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+              {filtered.map(product => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onClick={() => setSelectedProduct(product)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="py-16 text-center text-[#180A10]/40 text-sm">
+              No hay productos con estos filtros.
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Modals */}
       {selectedProduct && (
