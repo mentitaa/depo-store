@@ -10,27 +10,37 @@ export default function CartDrawer() {
   return (
     <>
       {/* Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-[#180A10]/30"
-          onClick={closeCart}
-        />
-      )}
+      <div
+        onClick={closeCart}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.3)',
+          zIndex: 40,
+          opacity: isOpen ? 1 : 0,
+          pointerEvents: isOpen ? 'auto' : 'none',
+          transition: 'opacity 0.3s ease',
+        }}
+      />
 
-      {/* Drawer — width transition via CSS class, flex sibling (no position:fixed) */}
+      {/* Drawer — position fixed, slides in from right */}
       <aside
-        className={`cart-drawer${isOpen ? ' open' : ''} z-40 relative bg-white border-l border-[#F0D4DC]`}
         aria-label="Carrito de compras"
+        style={{
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          height: '100vh',
+          width: 360,
+          zIndex: 50,
+          transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.3s ease',
+          background: '#ffffff',
+          borderLeft: '1px solid #F0D4DC',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
       >
-        {/* Inner: strict flex column at 100vh so footer always stays at the bottom */}
-        <div
-          style={{
-            width: 360,
-            height: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
           {/* ── Header (fixed top) ───────────────────────────── */}
           <div
             className="flex items-center justify-between px-5 border-b border-[#F0D4DC]"
@@ -143,7 +153,6 @@ export default function CartDrawer() {
               PROCEDER AL PAGO →
             </Link>
           </div>
-        </div>
       </aside>
     </>
   )

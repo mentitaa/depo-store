@@ -2,14 +2,6 @@
 
 const MONO = 'ui-monospace, "Cascadia Code", "Fira Code", monospace'
 
-const GARMENTS = [
-  { emoji: '👗', label: 'Vestido floral' },
-  { emoji: '🧥', label: 'Chaqueta' },
-  { emoji: '👚', label: 'Top' },
-  { emoji: '🩱', label: 'Enterizo' },
-  { emoji: '👘', label: 'Kimono' },
-  { emoji: '🥻', label: 'Falda' },
-]
 
 export default function Hero() {
   return (
@@ -93,57 +85,60 @@ export default function Hero() {
         </h1>
 
         {/* Rack animation */}
-        <div className="relative w-full max-w-xs">
-          <div className="relative mx-auto w-[300px]">
-            {/* Rod */}
-            <div className="h-1.5 w-full rounded-full" style={{ background: '#C85880', opacity: 0.9 }} />
-
-            {/* Hangers + garments */}
-            <div className="flex justify-between mt-0 px-2">
-              {GARMENTS.map((g, i) => (
-                <div key={i} className="garment flex flex-col items-center gap-0.5" style={{ width: 40 }}>
-                  {/* Hook */}
-                  <svg width="14" height="12" viewBox="0 0 16 14" fill="none">
-                    <path
-                      d="M8 0 C8 0 8 4 3 4 C0 4 0 8 3 8"
-                      stroke="#C85880"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      fill="none"
-                    />
-                  </svg>
-                  {/* Hanger body */}
-                  <svg width="32" height="16" viewBox="0 0 36 18" fill="none">
-                    <path
-                      d="M18 2 L2 16 L34 16 Z"
-                      stroke="#C85880"
-                      strokeWidth="1.5"
-                      strokeLinejoin="round"
-                      fill="#3A1A24"
-                    />
-                  </svg>
-                  {/* Garment */}
-                  <span className="text-xl leading-none mt-0.5" title={g.label}>{g.emoji}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Rack legs */}
-            <div
-              className="absolute w-1 rounded-full"
-              style={{ left: -12, top: 0, height: 88, background: '#C85880', opacity: 0.5 }}
-            />
-            <div
-              className="absolute w-1 rounded-full"
-              style={{ right: -12, top: 0, height: 88, background: '#C85880', opacity: 0.5 }}
-            />
-            {/* Base */}
-            <div
-              className="mx-auto rounded-full"
-              style={{ marginTop: 84, height: 5, width: 160, background: '#C85880', opacity: 0.35 }}
-            />
-          </div>
-        </div>
+        <svg viewBox="0 0 600 185" style={{ width: '100%', maxWidth: 580, overflow: 'visible' }}>
+          <rect x="16" y="34" width="568" height="5" fill="#3A1A24" rx="2.5"/>
+          <rect x="296" y="2" width="5" height="34" fill="#3A1A24"/>
+          <g className="hg h1">
+            <circle cx="82" cy="32" r="4.5" fill="none" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="82" y1="36" x2="55" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="82" y1="36" x2="109" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="55" y1="66" x2="109" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <path d="M58,66 L44,152 L120,152 L106,66 Z" fill="#F4AABF"/>
+            <path d="M63,66 L58,90 L106,90 L101,66 Z" fill="#E890AC"/>
+          </g>
+          <g className="hg h2">
+            <circle cx="162" cy="32" r="4.5" fill="none" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="162" y1="36" x2="135" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="162" y1="36" x2="189" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="135" y1="66" x2="189" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <rect x="137" y="66" width="50" height="46" fill="#98D0AA" rx="2"/>
+            <rect x="144" y="112" width="16" height="48" fill="#98D0AA"/>
+            <rect x="164" y="112" width="16" height="48" fill="#84BEAA"/>
+          </g>
+          <g className="hg h3">
+            <circle cx="242" cy="32" r="4.5" fill="none" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="242" y1="36" x2="215" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="242" y1="36" x2="269" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="215" y1="66" x2="269" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <path d="M217,66 L212,114 L272,114 L267,66 Z" fill="#E8D0B4"/>
+            <path d="M222,66 L217,88 L267,88 L262,66 Z" fill="#D8BC9C"/>
+          </g>
+          <g className="hg h4">
+            <circle cx="358" cy="32" r="4.5" fill="none" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="358" y1="36" x2="331" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="358" y1="36" x2="385" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="331" y1="66" x2="385" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <path d="M334,66 L318,155 L398,155 L382,66 Z" fill="#C8B4EC"/>
+            <path d="M340,66 L334,92 L382,92 L376,66 Z" fill="#B4A0DC"/>
+          </g>
+          <g className="hg h5">
+            <circle cx="438" cy="32" r="4.5" fill="none" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="438" y1="36" x2="411" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="438" y1="36" x2="465" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="411" y1="66" x2="465" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <rect x="413" y="66" width="50" height="44" fill="#F4A890" rx="2"/>
+            <rect x="418" y="110" width="17" height="52" fill="#F4A890"/>
+            <rect x="439" y="110" width="17" height="52" fill="#E49480"/>
+          </g>
+          <g className="hg h6">
+            <circle cx="518" cy="32" r="4.5" fill="none" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="518" y1="36" x2="491" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="518" y1="36" x2="545" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <line x1="491" y1="66" x2="545" y2="66" stroke="#C85880" strokeWidth="1.5"/>
+            <path d="M493,66 L487,118 L549,118 L543,66 Z" fill="#A8C8EC"/>
+            <path d="M498,66 L493,90 L543,90 L538,66 Z" fill="#94B4DC"/>
+          </g>
+        </svg>
 
         {/* Subtitle */}
         <p

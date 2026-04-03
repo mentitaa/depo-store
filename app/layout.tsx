@@ -14,13 +14,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body className="min-h-dvh">
         <CartProvider>
-          <div className="flex min-h-dvh">
-            <div className="flex-1 min-w-0 flex flex-col">
-              {children}
-              <PoweredBy />
-            </div>
-            <CartDrawer />
+          <div className="flex flex-col min-h-dvh">
+            {children}
+            <PoweredBy />
           </div>
+          <CartDrawer />
         </CartProvider>
       </body>
     </html>
