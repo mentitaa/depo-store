@@ -32,6 +32,7 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
   const [formError, setFormError] = useState('')
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const dragIndex = useRef<number | null>(null)
   const [form, setForm] = useState({ name: '', price: '', stock: '1' })
   const [categories, setCategories] = useState<string[]>([])
   const [sizes, setSizes] = useState<string[]>([])
@@ -52,6 +53,28 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
     setImagePreviews(prev => prev.filter((_, i) => i !== index))
   }
 
+  function handleDragStart(index: number) {
+    dragIndex.current = index
+  }
+
+  function handleDrop(index: number) {
+    const from = dragIndex.current
+    if (from === null || from === index) return
+    setImageFiles(prev => {
+      const arr = [...prev]
+      const [item] = arr.splice(from, 1)
+      arr.splice(index, 0, item)
+      return arr
+    })
+    setImagePreviews(prev => {
+      const arr = [...prev]
+      const [item] = arr.splice(from, 1)
+      arr.splice(index, 0, item)
+      return arr
+    })
+    dragIndex.current = null
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setFormError('')
@@ -70,7 +93,8 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
           imageUrls = await Promise.all(imageFiles.map(f => uploadProductImage(f)))
         } catch (uploadErr) {
           console.error('[Admin] Error subiendo imágenes:', uploadErr)
-          throw new Error(`Error subiendo imágenes: ${uploadErr instanceof Error ? uploadErr.message : String(uploadErr)}`)
+          const uploadMsg = uploadErr instanceof Error ? uploadErr.message : (uploadErr as { message?: string })?.message ?? JSON.stringify(uploadErr)
+          throw new Error(`Error subiendo imágenes: ${uploadMsg}`)
         }
       }
 
@@ -98,7 +122,12 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
       setTimeout(() => setSuccess(false), 5000)
     } catch (err: unknown) {
       console.error('[Admin] Error guardando producto:', err)
-      setFormError(err instanceof Error ? err.message : `Error desconocido: ${String(err)}`)
+      const msg =
+        err instanceof Error
+          ? err.message
+          : (err as { message?: string })?.message
+          ?? JSON.stringify(err)
+      setFormError(msg)
     } finally {
       setLoading(false)
       onAdded()
@@ -126,9 +155,22 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
             {imagePreviews.length > 0 ? (
               <div className="flex h-full gap-1.5 p-1.5">
                 {imagePreviews.map((src, i) => (
-                  <div key={i} className="relative h-full flex-1 rounded-lg overflow-hidden bg-[#F0D4DC]" style={{ minWidth: 0 }}>
+                  <div
+                    key={i}
+                    className="relative h-full flex-1 rounded-lg overflow-hidden bg-[#F0D4DC] cursor-grab active:cursor-grabbing"
+                    style={{ minWidth: 0 }}
+                    draggable
+                    onDragStart={() => handleDragStart(i)}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={() => handleDrop(i)}
+                  >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={src} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
+                    {i === 0 && (
+                      <span className="absolute bottom-1 left-1 text-[9px] font-bold bg-[#C85880] text-white px-1.5 py-0.5 rounded-full leading-none">
+                        Principal
+                      </span>
+                    )}
                     <button
                       type="button"
                       onClick={() => removeImage(i)}
