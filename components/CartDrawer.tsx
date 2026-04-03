@@ -17,17 +17,25 @@ export default function CartDrawer() {
         />
       )}
 
-      {/* Drawer — flexbox width transition, NOT position:fixed */}
+      {/* Drawer — width transition via CSS class, flex sibling (no position:fixed) */}
       <aside
-        className={`cart-drawer${isOpen ? ' open' : ''} z-40 relative bg-white border-l border-[#F0D4DC] flex flex-col`}
-        style={{ minHeight: '100dvh' }}
+        className={`cart-drawer${isOpen ? ' open' : ''} z-40 relative bg-white border-l border-[#F0D4DC]`}
         aria-label="Carrito de compras"
       >
-        {/* Inner wrapper keeps content at fixed 360px even while animating */}
-        <div className="flex flex-col h-full" style={{ width: 360 }}>
-
-          {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[#F0D4DC]">
+        {/* Inner: strict flex column at 100vh so footer always stays at the bottom */}
+        <div
+          style={{
+            width: 360,
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {/* ── Header (fixed top) ───────────────────────────── */}
+          <div
+            className="flex items-center justify-between px-5 border-b border-[#F0D4DC]"
+            style={{ height: 56, flexShrink: 0 }}
+          >
             <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-[#180A10]">
               MI CARRITO
               {totalItems > 0 && (
@@ -43,8 +51,11 @@ export default function CartDrawer() {
             </button>
           </div>
 
-          {/* Items */}
-          <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
+          {/* ── Items (scrollable middle) ─────────────────────── */}
+          <div
+            className="px-5 py-4 flex flex-col gap-4"
+            style={{ flex: 1, overflowY: 'auto' }}
+          >
             {items.length === 0 ? (
               <p className="text-sm text-[#180A10]/40 text-center mt-10">
                 Tu carrito está vacío.
@@ -56,8 +67,10 @@ export default function CartDrawer() {
                   className="flex gap-3 items-start"
                 >
                   {/* Thumbnail */}
-                  <div className="w-14 h-18 rounded-xl overflow-hidden bg-[#F9E8EF] flex-shrink-0 flex items-center justify-center"
-                    style={{ height: 72 }}>
+                  <div
+                    className="rounded-xl overflow-hidden bg-[#F9E8EF] flex-shrink-0 flex items-center justify-center"
+                    style={{ width: 56, height: 72 }}
+                  >
                     {item.product.image_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -107,24 +120,29 @@ export default function CartDrawer() {
             )}
           </div>
 
-          {/* Footer */}
-          {items.length > 0 && (
-            <div className="border-t border-[#F0D4DC] px-5 py-5 flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-[#180A10]/50 uppercase tracking-widest">Total</span>
-                <span className="text-xl font-bold text-[#180A10]">
-                  S/ {totalPrice.toFixed(2)}
-                </span>
-              </div>
-              <Link
-                href="/checkout"
-                onClick={closeCart}
-                className="w-full py-3 rounded-full bg-[#C85880] text-white text-sm font-semibold text-center hover:bg-[#a8446a] transition-colors"
-              >
-                PROCEDER AL PAGO →
-              </Link>
+          {/* ── Footer (fixed bottom, always visible) ─────────── */}
+          <div
+            className="border-t border-[#F0D4DC] px-5 py-5 flex flex-col gap-3 bg-white"
+            style={{ flexShrink: 0 }}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[#180A10]/50 uppercase tracking-widest">Total</span>
+              <span className="text-xl font-bold text-[#180A10]">
+                S/ {totalPrice.toFixed(2)}
+              </span>
             </div>
-          )}
+            <Link
+              href="/checkout"
+              onClick={closeCart}
+              className={`w-full py-3 rounded-full text-sm font-semibold text-center transition-colors ${
+                items.length > 0
+                  ? 'bg-[#C85880] text-white hover:bg-[#a8446a]'
+                  : 'bg-[#F0D4DC] text-[#180A10]/30 pointer-events-none'
+              }`}
+            >
+              PROCEDER AL PAGO →
+            </Link>
+          </div>
         </div>
       </aside>
     </>

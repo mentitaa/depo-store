@@ -8,7 +8,7 @@ import Navbar from '@/components/Navbar'
 import { useCart } from '@/context/CartContext'
 import { createOrder } from '@/lib/supabase'
 
-type PayMethod = 'culqi' | 'yape' | 'efectivo'
+type PayMethod = 'culqi' | 'yape'
 
 // Culqi global injected by the script
 declare global {
@@ -270,9 +270,8 @@ export default function CheckoutPage() {
                   </h2>
 
                   {([
-                    { value: 'culqi',    label: 'Tarjeta crédito / débito',  icon: <CreditCard size={16} /> },
-                    { value: 'yape',     label: 'Yape / Plin',               icon: <Smartphone size={16} /> },
-                    { value: 'efectivo', label: 'Efectivo contra entrega',   icon: <span className="text-base leading-none">💵</span> },
+                    { value: 'culqi', label: 'Tarjeta crédito / débito', icon: <CreditCard size={16} /> },
+                    { value: 'yape',  label: 'Yape / Plin / Dale',       icon: <Smartphone size={16} /> },
                   ] as const).map(opt => (
                     <button
                       key={opt.value}
@@ -316,7 +315,8 @@ export default function CheckoutPage() {
                     ? 'Procesando…'
                     : payMethod === 'culqi'
                       ? 'PAGAR CON CULQI →'
-                      : 'CONFIRMAR PEDIDO →'}
+                      : 'CONFIRMAR PEDIDO →'
+                  }
                 </button>
               </div>
 

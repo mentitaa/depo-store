@@ -10,8 +10,8 @@ function Logo() {
       <span
         style={{
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-          fontWeight: 600,
-          fontSize: 18,
+          fontWeight: 700,
+          fontSize: 22,
           letterSpacing: '0.04em',
           color: '#180A10',
           lineHeight: 1,
@@ -19,7 +19,7 @@ function Logo() {
       >
         Mi DEPO
       </span>
-      <span style={{ fontSize: 22, marginLeft: 6, lineHeight: 1 }}>📦</span>
+      <span style={{ fontSize: 26, marginLeft: 7, lineHeight: 1 }}>📦</span>
     </Link>
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 
 const FAQS = [
@@ -27,26 +26,38 @@ const FAQS = [
   },
 ]
 
-function Accordion({ q, a }: { q: string; a: string }) {
+function FaqRow({ q, a, last }: { q: string; a: string; last: boolean }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="border border-[#F0D4DC] rounded-2xl overflow-hidden bg-white">
+    <div className={last ? '' : 'border-b border-[#F0D4DC]'}>
       <button
         onClick={() => setOpen(v => !v)}
-        className="w-full flex items-center justify-between px-5 py-4 text-left gap-4 hover:bg-[#FFF0F4] transition-colors"
+        className="w-full flex items-start justify-between px-6 py-4 text-left gap-4 hover:bg-[#FFF8FA] transition-colors"
       >
-        <span className="text-sm font-semibold text-[#180A10]">{q}</span>
-        <ChevronDown
-          size={18}
-          className="text-[#C85880] flex-shrink-0 transition-transform duration-200"
-          style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
-        />
+        <span
+          className="text-sm text-[#180A10]"
+          style={{ fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace' }}
+        >
+          <span className="text-[#C85880] mr-2 select-none">›</span>
+          {q}
+        </span>
+        <span
+          className="text-[#C85880] text-lg leading-none flex-shrink-0 transition-transform duration-200 mt-0.5"
+          style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)', display: 'inline-block' }}
+        >
+          ›
+        </span>
       </button>
 
       {open && (
-        <div className="px-5 pb-5">
-          <p className="text-sm text-[#180A10]/60 leading-relaxed">{a}</p>
+        <div className="px-6 pb-5">
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: '#C85880' }}
+          >
+            {a}
+          </p>
         </div>
       )}
     </div>
@@ -57,16 +68,59 @@ export default function FaqPage() {
   return (
     <>
       <Navbar />
-      <main className="flex-1 max-w-xl mx-auto w-full px-4 py-12">
-        <h1 className="text-2xl font-bold text-[#180A10] mb-2">Preguntas frecuentes</h1>
-        <p className="text-sm text-[#180A10]/40 mb-8">Todo lo que necesitas saber antes de comprar.</p>
+      <main className="flex-1 flex items-start justify-center px-4 py-12 bg-[#FFF8FA]">
+        <div
+          className="w-full overflow-hidden"
+          style={{
+            maxWidth: 680,
+            background: '#ffffff',
+            border: '1px solid #F0D4DC',
+            borderRadius: 16,
+          }}
+        >
+          {/* Terminal header */}
+          <div
+            className="flex items-center gap-3 px-6 py-4"
+            style={{ background: '#180A10' }}
+          >
+            {/* Blinking dot */}
+            <span
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: '#28C840',
+                flexShrink: 0,
+                animation: 'blink 1.2s step-start infinite',
+              }}
+            />
+            <span
+              style={{
+                fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
+                fontSize: 13,
+                color: '#28C840',
+                letterSpacing: '0.03em',
+              }}
+            >
+              // preguntas frecuentes
+            </span>
+          </div>
 
-        <div className="flex flex-col gap-3">
-          {FAQS.map(faq => (
-            <Accordion key={faq.q} q={faq.q} a={faq.a} />
-          ))}
+          {/* FAQ rows */}
+          <div>
+            {FAQS.map((faq, i) => (
+              <FaqRow key={faq.q} q={faq.q} a={faq.a} last={i === FAQS.length - 1} />
+            ))}
+          </div>
         </div>
       </main>
+
+      <style>{`
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0; }
+        }
+      `}</style>
     </>
   )
 }
