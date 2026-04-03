@@ -90,20 +90,20 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
       console.log('[Admin] Guardando producto:', payload)
       await createProduct(payload)
 
-      // Reset
+      // Reset form
       setForm({ name: '', category: 'casual', price: '', stock: '1' })
       setSizes([])
       setColors([])
       setImageFiles([])
       setImagePreviews([])
       setSuccess(true)
-      setTimeout(() => setSuccess(false), 4000)
-      onAdded()
+      setTimeout(() => setSuccess(false), 5000)
     } catch (err: unknown) {
       console.error('[Admin] Error guardando producto:', err)
       setFormError(err instanceof Error ? err.message : `Error desconocido: ${String(err)}`)
     } finally {
       setLoading(false)
+      onAdded()
     }
   }
 
