@@ -576,18 +576,8 @@ export default function AdminPage() {
               ))}
             </div>
           )}
-        </div>
-
-        {/* ── RIGHT: Add product form + product list ────────── */}
-        <div className="flex flex-col gap-6">
-          <AddProductForm
-            onAdded={() => { fetchOrders(); fetchProducts() }}
-            editing={editingProduct}
-            onCancelEdit={() => setEditingProduct(null)}
-          />
-
           {/* Mis productos */}
-          <div className="bg-white rounded-2xl border border-[#F0D4DC] p-5 flex flex-col gap-4">
+          <div className="bg-white rounded-2xl border border-[#F0D4DC] p-5 flex flex-col gap-4 mt-6">
             <h2 className="text-sm font-bold text-[#180A10]">Mis productos ({products.length})</h2>
             {products.length === 0 ? (
               <p className="text-xs text-[#180A10]/40 text-center py-4">No hay productos aún.</p>
@@ -633,6 +623,15 @@ export default function AdminPage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* ── RIGHT: Add / edit product form ────────────────── */}
+        <div>
+          <AddProductForm
+            onAdded={() => { fetchOrders(); fetchProducts() }}
+            editing={editingProduct}
+            onCancelEdit={() => setEditingProduct(null)}
+          />
         </div>
       </div>
     </div>

@@ -21,7 +21,7 @@ export default function ProductCard({ product, onClick }: Props) {
   return (
     <div
       onClick={onClick}
-      className="group bg-white rounded-2xl overflow-hidden border border-[#F0D4DC] text-left transition-all duration-200 hover:border-[#C85880] hover:shadow-md cursor-pointer"
+      className="group bg-white rounded-2xl overflow-hidden border border-[#F0D4DC] text-left transition-all duration-200 hover:border-[#C85880] hover:shadow-md cursor-pointer relative"
     >
       {/* Image — 280px fixed, contain */}
       <div className="w-full overflow-hidden flex items-center justify-center relative" style={{ height: 280, background: '#FFF8FA' }}>
@@ -93,47 +93,6 @@ export default function ProductCard({ product, onClick }: Props) {
           ))}
         </div>
 
-        {/* Quick-add button — inline, flex-end, above price */}
-        {product.stock > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <button
-              onClick={handleQuickAdd}
-              aria-label="Agregar al carrito"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                background: '#ffffff',
-                border: '1px solid #F0D4DC',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'border-color 0.15s, box-shadow 0.15s',
-              }}
-              onMouseOver={e => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = '#C85880'
-                ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 3px 10px rgba(200,88,128,0.25)'
-              }}
-              onMouseOut={e => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = '#F0D4DC'
-                ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.10)'
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
-                  stroke="#C85880" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-                />
-                <line x1="3" y1="6" x2="21" y2="6" stroke="#C85880" strokeWidth="1.8" strokeLinecap="round"/>
-                <line x1="12" y1="11" x2="12" y2="17" stroke="#C85880" strokeWidth="1.8" strokeLinecap="round"/>
-                <line x1="9" y1="14" x2="15" y2="14" stroke="#C85880" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-          </div>
-        )}
-
         {/* Price */}
         <p
           style={{
@@ -147,6 +106,48 @@ export default function ProductCard({ product, onClick }: Props) {
         </p>
 
       </div>
+
+      {/* Quick-add button — absolute bottom-right */}
+      {product.stock > 0 && (
+        <button
+          onClick={handleQuickAdd}
+          aria-label="Agregar al carrito"
+          style={{
+            position: 'absolute',
+            bottom: 12,
+            right: 12,
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: '#ffffff',
+            border: '1px solid #F0D4DC',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'border-color 0.15s, box-shadow 0.15s',
+          }}
+          onMouseOver={e => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = '#C85880'
+            ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 3px 10px rgba(200,88,128,0.25)'
+          }}
+          onMouseOut={e => {
+            (e.currentTarget as HTMLButtonElement).style.borderColor = '#F0D4DC'
+            ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.10)'
+          }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
+              stroke="#C85880" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+            />
+            <line x1="3" y1="6" x2="21" y2="6" stroke="#C85880" strokeWidth="1.8" strokeLinecap="round"/>
+            <line x1="12" y1="11" x2="12" y2="17" stroke="#C85880" strokeWidth="1.8" strokeLinecap="round"/>
+            <line x1="9" y1="14" x2="15" y2="14" stroke="#C85880" strokeWidth="1.8" strokeLinecap="round"/>
+          </svg>
+        </button>
+      )}
     </div>
   )
 }
