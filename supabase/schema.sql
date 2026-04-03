@@ -12,7 +12,7 @@ create extension if not exists "uuid-ossp";
 create table if not exists products (
   id          uuid primary key default uuid_generate_v4(),
   name        text not null,
-  category    text not null check (category in ('vestidos', 'deportiva', 'casual')),
+  category    text[] not null default '{}',
   price       numeric(10, 2) not null check (price >= 0),
   sizes       text[] not null default '{}',
   colors      text[] not null default '{}',

@@ -1,9 +1,10 @@
-export type Category = 'todos' | 'vestidos' | 'deportiva' | 'casual'
+export type Category = 'vestidos' | 'deportiva' | 'casual'
+export type CategoryFilter = 'todos' | Category
 
 export interface Product {
   id: string
   name: string
-  category: Category
+  category: string[]
   price: number
   sizes: string[]
   colors: string[]

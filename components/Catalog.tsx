@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import { SlidersHorizontal } from 'lucide-react'
-import type { Product, Category } from '@/lib/types'
+import type { Product, CategoryFilter } from '@/lib/types'
 import ProductCard from './ProductCard'
 import ProductModal from './ProductModal'
 import FilterModal, { type FilterValues } from './FilterModal'
 
-const CATEGORIES: { label: string; value: Category | 'todos' }[] = [
+const CATEGORIES: { label: string; value: CategoryFilter }[] = [
   { label: 'Todos', value: 'todos' },
   { label: 'Vestidos', value: 'vestidos' },
   { label: 'Deportivo', value: 'deportiva' },
@@ -19,13 +19,13 @@ interface Props {
 }
 
 export default function Catalog({ initialProducts = [] }: Props) {
-  const [activeCategory, setActiveCategory] = useState<Category | 'todos'>('todos')
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>('todos')
   const [filters, setFilters] = useState<FilterValues>({ sizes: [], colors: [] })
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [showFilters, setShowFilters] = useState(false)
 
   const filtered = initialProducts.filter(p => {
-    if (activeCategory !== 'todos' && p.category !== activeCategory) return false
+    if (activeCategory !== 'todos' && !p.category.includes(activeCategory)) return false
     if (filters.sizes.length > 0 && !filters.sizes.some(s => p.sizes.includes(s))) return false
     if (filters.colors.length > 0 && !filters.colors.some(c => p.colors.includes(c))) return false
     return true

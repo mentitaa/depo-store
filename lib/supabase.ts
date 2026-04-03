@@ -69,3 +69,8 @@ export async function updateOrderStatus(id: string, status: 'pendiente' | 'envia
   const { error } = await supabase.from('orders').update({ status }).eq('id', id)
   if (error) throw error
 }
+
+export async function deleteProduct(id: string) {
+  const { error } = await supabase.from('products').delete().eq('id', id)
+  if (error) throw error
+}

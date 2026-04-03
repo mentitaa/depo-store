@@ -43,7 +43,7 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
   }
 
   const images = product.image_urls ?? []
-  const imgBg = CATEGORY_BG[product.category] ?? '#F0D4DC'
+  const imgBg = CATEGORY_BG[product.category[0]] ?? '#F0D4DC'
 
   function prev() {
     setImgIndex(i => (i === 0 ? images.length - 1 : i - 1))
@@ -79,7 +79,7 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
         {/* Image carousel */}
         <div
           className="w-full flex items-center justify-center overflow-hidden relative"
-          style={{ height: 340, backgroundColor: '#FFF8FA' }}
+          style={{ height: 420, backgroundColor: '#FFF8FA' }}
         >
           {images.length > 0 ? (
             <>
@@ -190,7 +190,7 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
               style={{
                 fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
                 fontWeight: 700,
-                fontSize: 20,
+                fontSize: 24,
                 color: '#C85880',
                 flexShrink: 0,
               }}

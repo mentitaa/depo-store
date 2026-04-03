@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase, updateOrderStatus, createProduct, uploadProductImage } from '@/lib/supabase'
+import { supabase, updateOrderStatus, createProduct, uploadProductImage, getProducts, deleteProduct } from '@/lib/supabase'
 import type { Order, Product, Category } from '@/lib/types'
-import { PackageCheck, Plus, LogOut, RefreshCw, Upload, X } from 'lucide-react'
+import { PackageCheck, Plus, LogOut, RefreshCw, Upload, X, Trash2 } from 'lucide-react'
 
 const SIZES_OPTIONS = ['XS', 'S', 'M', 'L', 'XL']
 const COLOR_OPTIONS = [
@@ -32,12 +32,8 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
   const [formError, setFormError] = useState('')
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [imagePreviews, setImagePreviews] = useState<string[]>([])
-  const [form, setForm] = useState({
-    name: '',
-    category: 'casual' as Category,
-    price: '',
-    stock: '1',
-  })
+  const [form, setForm] = useState({ name: '', price: '', stock: '1' })
+  const [categories, setCategories] = useState<string[]>([])
   const [sizes, setSizes] = useState<string[]>([])
   const [colors, setColors] = useState<string[]>([])
 
@@ -63,12 +59,13 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
     if (sizes.length === 0) { setFormError('Selecciona al menos una talla.'); return }
     if (colors.length === 0) { setFormError('Selecciona al menos un color.'); return }
 
+    if (categories.length === 0) { setFormError('Selecciona al menos una categoría.'); return }
+
     setLoading(true)
     try {
       // Step 1: upload images
       let imageUrls: string[] = []
       if (imageFiles.length > 0) {
-        setFormError('')
         try {
           imageUrls = await Promise.all(imageFiles.map(f => uploadProductImage(f)))
         } catch (uploadErr) {
@@ -80,7 +77,7 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
       // Step 2: save product
       const payload = {
         name: form.name,
-        category: form.category,
+        category: categories,
         price: parseFloat(form.price),
         image_urls: imageUrls,
         stock: parseInt(form.stock),
@@ -91,7 +88,8 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
       await createProduct(payload)
 
       // Reset form
-      setForm({ name: '', category: 'casual', price: '', stock: '1' })
+      setForm({ name: '', price: '', stock: '1' })
+      setCategories([])
       setSizes([])
       setColors([])
       setImageFiles([])
@@ -116,34 +114,50 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-        {/* Image upload — up to 4 images */}
+        {/* Image upload — full width, 200px, previews in a row */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs text-[#180A10]/50 font-medium">
             Fotos del producto ({imagePreviews.length}/4)
           </label>
-          <div className="grid grid-cols-2 gap-2">
-            {imagePreviews.map((src, i) => (
-              <div key={i} className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F0D4DC]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removeImage(i)}
-                  className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center hover:bg-[#F0D4DC] transition-colors"
-                >
-                  <X size={12} />
-                </button>
+          <div
+            className="w-full rounded-xl border-2 border-dashed border-[#F0D4DC] overflow-hidden"
+            style={{ height: 200 }}
+          >
+            {imagePreviews.length > 0 ? (
+              <div className="flex h-full gap-1.5 p-1.5">
+                {imagePreviews.map((src, i) => (
+                  <div key={i} className="relative h-full flex-1 rounded-lg overflow-hidden bg-[#F0D4DC]" style={{ minWidth: 0 }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt={`Preview ${i + 1}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-white/90 flex items-center justify-center hover:bg-[#F0D4DC] transition-colors"
+                    >
+                      <X size={10} />
+                    </button>
+                  </div>
+                ))}
+                {imagePreviews.length < 4 && (
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    className="h-full flex-shrink-0 w-16 rounded-lg border-2 border-dashed border-[#F0D4DC] flex flex-col items-center justify-center gap-1 hover:border-[#C85880] transition-colors group"
+                  >
+                    <Upload size={14} className="text-[#180A10]/30 group-hover:text-[#C85880] transition-colors" />
+                    <span className="text-[10px] text-[#180A10]/40 group-hover:text-[#C85880] transition-colors">+</span>
+                  </button>
+                )}
               </div>
-            ))}
-            {imagePreviews.length < 4 && (
+            ) : (
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="aspect-[4/3] rounded-xl border-2 border-dashed border-[#F0D4DC] flex flex-col items-center justify-center gap-2 hover:border-[#C85880] transition-colors group"
+                className="w-full h-full flex flex-col items-center justify-center gap-2 hover:border-[#C85880] transition-colors group"
               >
-                <Upload size={18} className="text-[#180A10]/30 group-hover:text-[#C85880] transition-colors" />
+                <Upload size={22} className="text-[#180A10]/30 group-hover:text-[#C85880] transition-colors" />
                 <span className="text-xs text-[#180A10]/40 group-hover:text-[#C85880] transition-colors">
-                  Agregar
+                  Subir fotos (hasta 4)
                 </span>
               </button>
             )}
@@ -170,30 +184,36 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
           />
         </div>
 
-        {/* Category + Price in row */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-[#180A10]/50 font-medium">Categoría</label>
-            <select
-              value={form.category}
-              onChange={e => setForm(p => ({ ...p, category: e.target.value as Category }))}
-              className="px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA]"
-            >
-              {CATEGORIES.map(c => (
-                <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
-              ))}
-            </select>
+        {/* Categories — checkboxes */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-[#180A10]/50 font-medium">Categoría</label>
+          <div className="flex gap-2">
+            {CATEGORIES.map(c => (
+              <button
+                key={c} type="button"
+                onClick={() => setCategories(prev => toggle(prev, c))}
+                className={`px-3 py-1.5 rounded-lg border text-sm transition-colors ${
+                  categories.includes(c)
+                    ? 'border-[#C85880] bg-[#C85880] text-white'
+                    : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
+                }`}
+              >
+                {c.charAt(0).toUpperCase() + c.slice(1)}
+              </button>
+            ))}
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-[#180A10]/50 font-medium">Precio (S/)</label>
-            <input
-              type="number" required min="0" step="0.01"
-              value={form.price}
-              onChange={e => setForm(p => ({ ...p, price: e.target.value }))}
-              placeholder="89.90"
-              className="px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA]"
-            />
-          </div>
+        </div>
+
+        {/* Price */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#180A10]/50 font-medium">Precio (S/)</label>
+          <input
+            type="number" required min="0" step="0.01"
+            value={form.price}
+            onChange={e => setForm(p => ({ ...p, price: e.target.value }))}
+            placeholder="89.90"
+            className="px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA]"
+          />
         </div>
 
         {/* Stock */}
@@ -281,6 +301,8 @@ export default function AdminPage() {
   const [checkingAuth, setCheckingAuth] = useState(true)
   const [orders, setOrders] = useState<Order[]>([])
   const [loadingOrders, setLoadingOrders] = useState(false)
+  const [products, setProducts] = useState<Product[]>([])
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   // Auth check — redirect to /admin/login if no session
   useEffect(() => {
@@ -308,10 +330,32 @@ export default function AdminPage() {
     }
   }, [])
 
+  const fetchProducts = useCallback(async () => {
+    try {
+      const data = await getProducts()
+      setProducts(data)
+    } catch (err) {
+      console.error(err)
+    }
+  }, [])
+
+  async function handleDeleteProduct(id: string) {
+    setDeletingId(id)
+    try {
+      await deleteProduct(id)
+      setProducts(prev => prev.filter(p => p.id !== id))
+    } catch (err) {
+      console.error('[Admin] Error eliminando producto:', err)
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
   // Load + realtime subscription
   useEffect(() => {
     if (checkingAuth) return
     fetchOrders()
+    fetchProducts()
 
     const channel = supabase
       .channel('orders-realtime')
@@ -319,7 +363,7 @@ export default function AdminPage() {
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [checkingAuth, fetchOrders])
+  }, [checkingAuth, fetchOrders, fetchProducts])
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -459,8 +503,49 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* ── RIGHT: Add product form ──────────────────────── */}
-        <AddProductForm onAdded={fetchOrders} />
+        {/* ── RIGHT: Add product form + product list ────────── */}
+        <div className="flex flex-col gap-6">
+          <AddProductForm onAdded={() => { fetchOrders(); fetchProducts() }} />
+
+          {/* Mis productos */}
+          <div className="bg-white rounded-2xl border border-[#F0D4DC] p-5 flex flex-col gap-4">
+            <h2 className="text-sm font-bold text-[#180A10]">Mis productos ({products.length})</h2>
+            {products.length === 0 ? (
+              <p className="text-xs text-[#180A10]/40 text-center py-4">No hay productos cargados.</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {products.map(p => (
+                  <div key={p.id} className="flex items-center gap-3 border border-[#F0D4DC] rounded-xl p-2">
+                    {/* Thumbnail */}
+                    <div className="w-12 h-14 rounded-lg overflow-hidden bg-[#FFF8FA] flex-shrink-0 flex items-center justify-center">
+                      {p.image_urls?.[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={p.image_urls[0]} alt={p.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-xl">👗</span>
+                      )}
+                    </div>
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-[#180A10] line-clamp-1">{p.name}</p>
+                      <p className="text-xs text-[#C85880] font-bold">S/ {p.price.toFixed(2)}</p>
+                      <p className="text-[10px] text-[#180A10]/40">{p.category.join(', ')}</p>
+                    </div>
+                    {/* Delete */}
+                    <button
+                      onClick={() => handleDeleteProduct(p.id)}
+                      disabled={deletingId === p.id}
+                      className="p-1.5 rounded-lg border border-red-200 text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors flex-shrink-0 disabled:opacity-40"
+                      aria-label="Eliminar producto"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
