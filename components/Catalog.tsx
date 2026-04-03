@@ -106,14 +106,14 @@ export default function Catalog({ initialProducts = DEMO_PRODUCTS }: Props) {
   const MONO = 'ui-monospace, "Cascadia Code", "Fira Code", monospace'
 
   return (
-    <section id="catalogo" className="px-4 sm:px-6 pb-16">
+    <section id="catalogo" style={{ margin: '20px 24px 24px' }}>
       {/* Card container */}
       <div
         style={{
+          background: '#ffffff',
           border: '1px solid #F0D4DC',
           borderRadius: 12,
           overflow: 'hidden',
-          marginBottom: 0,
         }}
       >
         {/* Dark header */}
