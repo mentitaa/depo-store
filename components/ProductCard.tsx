@@ -44,7 +44,7 @@ export default function ProductCard({ product, onClick }: Props) {
       </div>
 
       {/* Info */}
-      <div className="p-3 flex flex-col gap-1.5">
+      <div className="p-2 flex flex-col gap-1">
         {/* Category badge */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
           <span

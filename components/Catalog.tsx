@@ -158,7 +158,7 @@ export default function Catalog({ initialProducts = [] }: Props) {
         {/* Grid */}
         <div style={{ padding: '16px', background: '#ffffff' }}>
           {filtered.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
               {filtered.map(product => (
                 <ProductCard
                   key={product.id}

@@ -1,11 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { X, Trash2 } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 
 export default function CartDrawer() {
-  const { items, isOpen, totalItems, totalPrice, removeItem, closeCart } = useCart()
+  const { items, isOpen, totalItems, totalPrice, updateQuantity, closeCart } = useCart()
 
   return (
     <>
@@ -107,24 +107,32 @@ export default function CartDrawer() {
                         style={{ backgroundColor: item.color }}
                       />
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center justify-between mt-2">
                       <p className="text-[#C85880] font-bold text-sm">
                         S/ {(item.product.price * item.quantity).toFixed(2)}
                       </p>
-                      {item.quantity > 1 && (
-                        <span className="text-xs text-[#180A10]/30">×{item.quantity}</span>
-                      )}
+                      {/* Quantity controls */}
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity - 1)}
+                          className="w-6 h-6 rounded-full border border-[#F0D4DC] flex items-center justify-center text-[#180A10]/50 hover:border-[#C85880] hover:text-[#C85880] transition-colors text-sm font-bold leading-none"
+                          aria-label="Reducir cantidad"
+                        >
+                          −
+                        </button>
+                        <span className="text-xs font-semibold text-[#180A10] w-4 text-center">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity + 1)}
+                          className="w-6 h-6 rounded-full border border-[#F0D4DC] flex items-center justify-center text-[#180A10]/50 hover:border-[#C85880] hover:text-[#C85880] transition-colors text-sm font-bold leading-none"
+                          aria-label="Aumentar cantidad"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Remove */}
-                  <button
-                    onClick={() => removeItem(item.product.id, item.size, item.color)}
-                    aria-label="Eliminar"
-                    className="p-1 hover:text-[#C85880] text-[#180A10]/20 transition-colors flex-shrink-0 mt-0.5"
-                  >
-                    <Trash2 size={14} />
-                  </button>
                 </div>
               ))
             )}

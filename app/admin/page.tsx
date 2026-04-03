@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase, updateOrderStatus, createProduct, uploadProductImage, getProducts, deleteProduct } from '@/lib/supabase'
+import { supabase, updateOrderStatus, createProduct, updateProduct, uploadProductImage, getProducts, deleteProduct } from '@/lib/supabase'
 import type { Order, Product, Category } from '@/lib/types'
-import { PackageCheck, Plus, LogOut, RefreshCw, Upload, X, Trash2 } from 'lucide-react'
+import { PackageCheck, Plus, LogOut, RefreshCw, Upload, X, Trash2, Pencil } from 'lucide-react'
 
 const SIZES_OPTIONS = ['XS', 'S', 'M', 'L', 'XL']
 const COLOR_OPTIONS = [
@@ -25,18 +25,30 @@ function toggle<T>(arr: T[], val: T): T[] {
 
 // ─── Add Product Form (right column) ─────────────────────────────────────────
 
-function AddProductForm({ onAdded }: { onAdded: () => void }) {
+function AddProductForm({ onAdded, editing, onCancelEdit }: {
+  onAdded: () => void
+  editing?: Product | null
+  onCancelEdit?: () => void
+}) {
   const fileRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [formError, setFormError] = useState('')
   const [imageFiles, setImageFiles] = useState<File[]>([])
-  const [imagePreviews, setImagePreviews] = useState<string[]>([])
+  const [imagePreviews, setImagePreviews] = useState<string[]>(editing?.image_urls ?? [])
   const dragIndex = useRef<number | null>(null)
-  const [form, setForm] = useState({ name: '', price: '', stock: '1' })
-  const [categories, setCategories] = useState<string[]>([])
-  const [sizes, setSizes] = useState<string[]>([])
-  const [colors, setColors] = useState<string[]>([])
+  const [form, setForm] = useState({
+    name: editing?.name ?? '',
+    price: editing?.price?.toString() ?? '',
+    stock: editing?.stock?.toString() ?? '1',
+  })
+  const [categories, setCategories] = useState<string[]>(
+    Array.isArray(editing?.category) ? editing.category : editing?.category ? [editing.category as unknown as string] : []
+  )
+  const [sizes, setSizes] = useState<string[]>(editing?.sizes ?? [])
+  const [colors, setColors] = useState<string[]>(editing?.colors ?? [])
+  // existing URLs when editing (not re-uploaded files)
+  const [existingUrls, setExistingUrls] = useState<string[]>(editing?.image_urls ?? [])
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
@@ -86,17 +98,21 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
 
     setLoading(true)
     try {
-      // Step 1: upload images
-      let imageUrls: string[] = []
+      // Step 1: upload new images, keep existing URLs
+      let newUrls: string[] = []
       if (imageFiles.length > 0) {
         try {
-          imageUrls = await Promise.all(imageFiles.map(f => uploadProductImage(f)))
+          newUrls = await Promise.all(imageFiles.map(f => uploadProductImage(f)))
         } catch (uploadErr) {
           console.error('[Admin] Error subiendo imágenes:', uploadErr)
           const uploadMsg = uploadErr instanceof Error ? uploadErr.message : (uploadErr as { message?: string })?.message ?? JSON.stringify(uploadErr)
           throw new Error(`Error subiendo imágenes: ${uploadMsg}`)
         }
       }
+      // Preserve order from imagePreviews: existing URLs stay as-is, new files appended
+      const imageUrls = editing
+        ? existingUrls.concat(newUrls)
+        : newUrls
 
       // Step 2: save product
       const payload = {
@@ -109,7 +125,11 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
         colors,
       }
       console.log('[Admin] Guardando producto:', payload)
-      await createProduct(payload)
+      if (editing) {
+        await updateProduct(editing.id, payload)
+      } else {
+        await createProduct(payload)
+      }
 
       // Reset form
       setForm({ name: '', price: '', stock: '1' })
@@ -118,8 +138,10 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
       setColors([])
       setImageFiles([])
       setImagePreviews([])
+      setExistingUrls([])
       setSuccess(true)
       setTimeout(() => setSuccess(false), 5000)
+      if (editing) onCancelEdit?.()
     } catch (err: unknown) {
       console.error('[Admin] Error guardando producto:', err)
       const msg =
@@ -136,9 +158,16 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
 
   return (
     <div className="bg-white rounded-2xl border border-[#F0D4DC] p-5 flex flex-col gap-5 sticky top-6">
-      <div className="flex items-center gap-2">
-        <Plus size={16} className="text-[#C85880]" />
-        <h2 className="text-sm font-bold text-[#180A10]">Nuevo producto</h2>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {editing ? <Pencil size={16} className="text-[#C85880]" /> : <Plus size={16} className="text-[#C85880]" />}
+          <h2 className="text-sm font-bold text-[#180A10]">{editing ? 'Editar producto' : 'Nuevo producto'}</h2>
+        </div>
+        {editing && (
+          <button type="button" onClick={onCancelEdit} className="text-xs text-[#180A10]/40 hover:text-[#C85880] transition-colors">
+            Cancelar
+          </button>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -329,7 +358,7 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
           disabled={loading}
           className="w-full py-3 rounded-full bg-[#C85880] text-white font-semibold text-sm hover:bg-[#a8446a] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {loading ? 'Guardando…' : 'GUARDAR PRODUCTO'}
+          {loading ? 'Guardando…' : editing ? 'GUARDAR CAMBIOS' : 'GUARDAR PRODUCTO'}
         </button>
       </form>
     </div>
@@ -345,6 +374,7 @@ export default function AdminPage() {
   const [loadingOrders, setLoadingOrders] = useState(false)
   const [products, setProducts] = useState<Product[]>([])
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
 
   // Auth check — redirect to /admin/login if no session
   useEffect(() => {
@@ -382,6 +412,7 @@ export default function AdminPage() {
   }, [])
 
   async function handleDeleteProduct(id: string) {
+    if (!confirm('¿Estás segura? Esta acción no se puede deshacer.')) return
     setDeletingId(id)
     try {
       await deleteProduct(id)
@@ -547,7 +578,11 @@ export default function AdminPage() {
 
         {/* ── RIGHT: Add product form + product list ────────── */}
         <div className="flex flex-col gap-6">
-          <AddProductForm onAdded={() => { fetchOrders(); fetchProducts() }} />
+          <AddProductForm
+            onAdded={() => { fetchOrders(); fetchProducts() }}
+            editing={editingProduct}
+            onCancelEdit={() => setEditingProduct(null)}
+          />
 
           {/* Mis productos */}
           <div className="bg-white rounded-2xl border border-[#F0D4DC] p-5 flex flex-col gap-4">
@@ -573,15 +608,24 @@ export default function AdminPage() {
                       <p className="text-xs text-[#C85880] font-bold">S/ {p.price.toFixed(2)}</p>
                       <p className="text-[10px] text-[#180A10]/40">{(Array.isArray(p.category) ? p.category : [p.category].filter(Boolean)).join(', ')}</p>
                     </div>
-                    {/* Delete */}
-                    <button
-                      onClick={() => handleDeleteProduct(p.id)}
-                      disabled={deletingId === p.id}
-                      className="p-1.5 rounded-lg border border-red-200 text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors flex-shrink-0 disabled:opacity-40"
-                      aria-label="Eliminar producto"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    {/* Edit + Delete */}
+                    <div className="flex gap-1.5 flex-shrink-0">
+                      <button
+                        onClick={() => setEditingProduct(p)}
+                        className="p-1.5 rounded-lg border border-[#F0D4DC] text-[#180A10]/40 hover:bg-[#FFF8FA] hover:text-[#C85880] transition-colors"
+                        aria-label="Editar producto"
+                      >
+                        <Pencil size={13} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteProduct(p.id)}
+                        disabled={deletingId === p.id}
+                        className="p-1.5 rounded-lg border border-red-200 text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-40"
+                        aria-label="Eliminar producto"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

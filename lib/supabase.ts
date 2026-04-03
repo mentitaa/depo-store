@@ -74,3 +74,9 @@ export async function deleteProduct(id: string) {
   const { error } = await supabase.from('products').delete().eq('id', id)
   if (error) throw error
 }
+
+export async function updateProduct(id: string, product: Omit<Product, 'id' | 'created_at'>) {
+  const { data, error } = await supabase.from('products').update(product).eq('id', id).select().single()
+  if (error) throw error
+  return data as Product
+}

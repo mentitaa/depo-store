@@ -10,6 +10,7 @@ interface CartContextValue {
   totalPrice: number
   addItem: (product: Product, size: string, color: string) => void
   removeItem: (productId: string, size: string, color: string) => void
+  updateQuantity: (productId: string, size: string, color: string, quantity: number) => void
   clearCart: () => void
   openCart: () => void
   closeCart: () => void
@@ -43,6 +44,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     )
   }, [])
 
+  const updateQuantity = useCallback((productId: string, size: string, color: string, quantity: number) => {
+    if (quantity <= 0) {
+      setItems(prev => prev.filter(i => !(i.product.id === productId && i.size === size && i.color === color)))
+    } else {
+      setItems(prev => prev.map(i =>
+        i.product.id === productId && i.size === size && i.color === color
+          ? { ...i, quantity }
+          : i
+      ))
+    }
+  }, [])
+
   const clearCart = useCallback(() => setItems([]), [])
 
   const totalItems = items.reduce((sum, i) => sum + i.quantity, 0)
@@ -57,6 +70,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         totalPrice,
         addItem,
         removeItem,
+        updateQuantity,
         clearCart,
         openCart: () => setIsOpen(true),
         closeCart: () => setIsOpen(false),

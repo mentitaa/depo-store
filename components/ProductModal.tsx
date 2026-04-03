@@ -139,8 +139,20 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
         <div className="p-5 flex flex-col gap-3">
           <h2 className="text-lg font-bold text-[#180A10] leading-snug">{product.name}</h2>
 
-          {/* Sizes + colors + price in one row */}
-          <div className="flex items-center gap-3">
+          {/* Price */}
+          <p
+            style={{
+              fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
+              fontWeight: 700,
+              fontSize: 26,
+              color: '#C85880',
+            }}
+          >
+            S/ {product.price.toFixed(2)}
+          </p>
+
+          {/* Sizes + colors in same row */}
+          <div className="flex items-start gap-4">
             {/* Sizes */}
             <div className="flex flex-col gap-1 flex-1">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-[#180A10]/40">Talla</p>
@@ -164,7 +176,7 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
             {/* Colors */}
             <div className="flex flex-col gap-1">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-[#180A10]/40">
-                Color
+                Color{selectedColor ? ` — ${COLOR_LABELS[selectedColor] ?? selectedColor}` : ''}
               </p>
               <div className="flex gap-1.5 flex-wrap">
                 {product.colors.map(color => (
@@ -185,19 +197,6 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
                 ))}
               </div>
             </div>
-
-            {/* Price */}
-            <p
-              style={{
-                fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
-                fontWeight: 700,
-                fontSize: 24,
-                color: '#C85880',
-                flexShrink: 0,
-              }}
-            >
-              S/ {product.price.toFixed(2)}
-            </p>
           </div>
 
           <button
