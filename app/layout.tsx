@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { CartProvider } from '@/context/CartContext'
 import CartDrawer from '@/components/CartDrawer'
+import PoweredBy from '@/components/PoweredBy'
 
 export const metadata: Metadata = {
   title: 'DEPO — Ropa femenina en Trujillo',
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
             <CartDrawer />
           </div>
+          <PoweredBy />
         </CartProvider>
       </body>
     </html>
