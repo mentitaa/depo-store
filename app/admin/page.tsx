@@ -59,14 +59,26 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setFormError('')
+    setSuccess(false)
     if (sizes.length === 0) { setFormError('Selecciona al menos una talla.'); return }
     if (colors.length === 0) { setFormError('Selecciona al menos un color.'); return }
 
     setLoading(true)
     try {
-      const imageUrls = await Promise.all(imageFiles.map(f => uploadProductImage(f)))
+      // Step 1: upload images
+      let imageUrls: string[] = []
+      if (imageFiles.length > 0) {
+        setFormError('')
+        try {
+          imageUrls = await Promise.all(imageFiles.map(f => uploadProductImage(f)))
+        } catch (uploadErr) {
+          console.error('[Admin] Error subiendo imágenes:', uploadErr)
+          throw new Error(`Error subiendo imágenes: ${uploadErr instanceof Error ? uploadErr.message : String(uploadErr)}`)
+        }
+      }
 
-      await createProduct({
+      // Step 2: save product
+      const payload = {
         name: form.name,
         category: form.category,
         price: parseFloat(form.price),
@@ -74,7 +86,9 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
         stock: parseInt(form.stock),
         sizes,
         colors,
-      })
+      }
+      console.log('[Admin] Guardando producto:', payload)
+      await createProduct(payload)
 
       // Reset
       setForm({ name: '', category: 'casual', price: '', stock: '1' })
@@ -83,10 +97,11 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
       setImageFiles([])
       setImagePreviews([])
       setSuccess(true)
-      setTimeout(() => setSuccess(false), 3000)
+      setTimeout(() => setSuccess(false), 4000)
       onAdded()
     } catch (err: unknown) {
-      setFormError(err instanceof Error ? err.message : 'Error al guardar el producto.')
+      console.error('[Admin] Error guardando producto:', err)
+      setFormError(err instanceof Error ? err.message : `Error desconocido: ${String(err)}`)
     } finally {
       setLoading(false)
     }
@@ -236,12 +251,15 @@ function AddProductForm({ onAdded }: { onAdded: () => void }) {
         </div>
 
         {formError && (
-          <p className="text-xs text-red-500 bg-red-50 rounded-lg px-3 py-2">{formError}</p>
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+            <p className="text-xs font-semibold text-red-600 mb-0.5">Error</p>
+            <p className="text-xs text-red-500 break-words">{formError}</p>
+          </div>
         )}
         {success && (
-          <p className="text-xs text-green-700 bg-green-50 rounded-lg px-3 py-2">
-            ✓ Producto agregado correctamente.
-          </p>
+          <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+            <p className="text-xs font-semibold text-green-700">Producto guardado correctamente</p>
+          </div>
         )}
 
         <button
