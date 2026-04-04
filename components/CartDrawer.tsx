@@ -1,11 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { X } from 'lucide-react'
+import { X, Trash2 } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 
 export default function CartDrawer() {
-  const { items, isOpen, totalItems, totalPrice, updateQuantity, closeCart } = useCart()
+  const { items, isOpen, totalItems, totalPrice, updateQuantity, removeItem, closeCart } = useCart()
 
   return (
     <>
@@ -95,9 +95,18 @@ export default function CartDrawer() {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#180A10] line-clamp-2 leading-snug">
-                      {item.product.name}
-                    </p>
+                    <div className="flex items-start justify-between gap-1">
+                      <p className="text-sm font-semibold text-[#180A10] line-clamp-2 leading-snug flex-1">
+                        {item.product.name}
+                      </p>
+                      <button
+                        onClick={() => removeItem(item.product.id, item.size, item.color)}
+                        aria-label="Eliminar producto"
+                        className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full hover:bg-red-50 transition-colors"
+                      >
+                        <Trash2 size={13} className="text-[#180A10]/30 hover:text-red-400" />
+                      </button>
+                    </div>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-[#180A10]/40 border border-[#F0D4DC] rounded px-1.5 py-0.5">
                         {item.size}

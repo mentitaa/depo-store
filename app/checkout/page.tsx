@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, X } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import { useCart } from '@/context/CartContext'
 import { createOrder } from '@/lib/supabase'
@@ -26,12 +26,17 @@ declare global {
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, totalPrice, clearCart } = useCart()
+  const { items, totalPrice, clearCart, updateQuantity, removeItem } = useCart()
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', reference: '' })
   const [payMethod, setPayMethod] = useState<PayMethod>('culqi')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const culqiReady = useRef(false)
+
+  // Redirect to home if cart empties while on this page
+  useEffect(() => {
+    if (items.length === 0) router.replace('/')
+  }, [items.length, router])
 
   // Load Culqi.js once
   useEffect(() => {
@@ -193,14 +198,37 @@ export default function CheckoutPage() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-[#180A10] line-clamp-1">{item.product.name}</p>
-                        <p className="text-xs text-[#180A10]/40 mt-0.5">
-                          Talla {item.size}{item.quantity > 1 ? ` × ${item.quantity}` : ''}
-                        </p>
+                        <div className="flex items-start justify-between gap-1">
+                          <p className="text-sm font-semibold text-[#180A10] line-clamp-1 flex-1">{item.product.name}</p>
+                          <button
+                            type="button"
+                            onClick={() => removeItem(item.product.id, item.size, item.color)}
+                            aria-label="Eliminar producto"
+                            className="flex-shrink-0 w-5 h-5 flex items-center justify-center rounded-full hover:bg-red-50 transition-colors"
+                          >
+                            <X size={12} className="text-[#180A10]/30 hover:text-red-400" />
+                          </button>
+                        </div>
+                        <p className="text-xs text-[#180A10]/40 mt-0.5">Talla {item.size}</p>
+                        <div className="flex items-center justify-between mt-1.5">
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity - 1)}
+                              className="w-5 h-5 rounded-full border border-[#F0D4DC] flex items-center justify-center text-[#180A10]/50 hover:border-[#C85880] hover:text-[#C85880] transition-colors text-xs font-bold leading-none"
+                            >−</button>
+                            <span className="text-xs font-semibold text-[#180A10] w-4 text-center">{item.quantity}</span>
+                            <button
+                              type="button"
+                              onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity + 1)}
+                              className="w-5 h-5 rounded-full border border-[#F0D4DC] flex items-center justify-center text-[#180A10]/50 hover:border-[#C85880] hover:text-[#C85880] transition-colors text-xs font-bold leading-none"
+                            >+</button>
+                          </div>
+                          <span className="text-sm font-bold text-[#C85880] flex-shrink-0">
+                            S/ {(item.product.price * item.quantity).toFixed(2)}
+                          </span>
+                        </div>
                       </div>
-                      <span className="text-sm font-bold text-[#180A10] flex-shrink-0">
-                        S/ {(item.product.price * item.quantity).toFixed(2)}
-                      </span>
                     </div>
                   ))}
 
