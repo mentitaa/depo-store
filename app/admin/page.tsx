@@ -124,12 +124,18 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
         sizes,
         colors,
       }
-      console.log('[Admin] Guardando producto:', payload)
+      console.log('[Admin] Payload completo a enviar:', JSON.stringify(payload, null, 2))
+      console.log('[Admin] colors tipo:', typeof payload.colors, '| valor:', payload.colors)
+      console.log('[Admin] sizes tipo:', typeof payload.sizes, '| valor:', payload.sizes)
+      console.log('[Admin] category tipo:', typeof payload.category, '| valor:', payload.category)
       if (editing) {
+        console.log('[Admin] Modo UPDATE — id:', editing.id)
         await updateProduct(editing.id, payload)
       } else {
+        console.log('[Admin] Modo INSERT')
         await createProduct(payload)
       }
+      console.log('[Admin] Guardado exitoso')
 
       // Reset form
       setForm({ name: '', price: '', stock: '1' })
@@ -161,7 +167,9 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {editing ? <Pencil size={16} className="text-[#C85880]" /> : <Plus size={16} className="text-[#C85880]" />}
-          <h2 className="text-sm font-bold text-[#180A10]">{editing ? 'Editar producto' : 'Nuevo producto'}</h2>
+          <h2 className="text-sm font-bold text-[#180A10]">
+            {editing ? `Editando: ${editing.name}` : 'Nuevo producto'}
+          </h2>
         </div>
         {editing && (
           <button type="button" onClick={onCancelEdit} className="text-xs text-[#180A10]/40 hover:text-[#C85880] transition-colors">
@@ -375,6 +383,7 @@ export default function AdminPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const formRef = useRef<HTMLDivElement>(null)
 
   // Auth check — redirect to /admin/login if no session
   useEffect(() => {
@@ -603,7 +612,10 @@ export default function AdminPage() {
                     {/* Edit + Delete */}
                     <div className="flex gap-1.5 flex-shrink-0">
                       <button
-                        onClick={() => setEditingProduct(p)}
+                        onClick={() => {
+                          setEditingProduct(p)
+                          setTimeout(() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+                        }}
                         className="p-1.5 rounded-lg border border-[#F0D4DC] text-[#180A10]/40 hover:bg-[#FFF8FA] hover:text-[#C85880] transition-colors"
                         aria-label="Editar producto"
                       >
@@ -626,8 +638,9 @@ export default function AdminPage() {
         </div>
 
         {/* ── RIGHT: Add / edit product form ────────────────── */}
-        <div>
+        <div ref={formRef}>
           <AddProductForm
+            key={editingProduct?.id ?? 'new'}
             onAdded={() => { fetchOrders(); fetchProducts() }}
             editing={editingProduct}
             onCancelEdit={() => setEditingProduct(null)}
