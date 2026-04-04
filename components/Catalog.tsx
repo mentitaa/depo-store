@@ -25,7 +25,11 @@ export default function Catalog({ initialProducts = [] }: Props) {
   const [showFilters, setShowFilters] = useState(false)
 
   const filtered = initialProducts.filter(p => {
-    const cats = Array.isArray(p.category) ? p.category : [p.category].filter(Boolean)
+    const cats = Array.isArray(p.category)
+      ? p.category
+      : typeof p.category === 'string' && (p.category as string).startsWith('[')
+        ? JSON.parse(p.category as string) as string[]
+        : [p.category].filter(Boolean)
     if (activeCategory !== 'todos' && !cats.includes(activeCategory)) return false
     if (filters.sizes.length > 0 && !filters.sizes.some(s => p.sizes.includes(s))) return false
     if (filters.colors.length > 0 && !filters.colors.some(c => p.colors.includes(c))) return false

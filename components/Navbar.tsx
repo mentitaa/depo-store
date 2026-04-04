@@ -28,7 +28,7 @@ export default function Navbar() {
       <div className="flex items-center gap-4">
         <Link
           href="/faq"
-          className="hidden sm:block transition-opacity hover:opacity-70"
+          className="transition-opacity hover:opacity-70"
           style={{ ...MONO, fontSize: 13, fontWeight: 700, color: '#C85880' }}
         >
           // ¿tienes dudas?
