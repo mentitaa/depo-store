@@ -42,9 +42,15 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
     price: editing?.price?.toString() ?? '',
     stock: editing?.stock?.toString() ?? '1',
   })
-  const [categories, setCategories] = useState<string[]>(
-    Array.isArray(editing?.category) ? editing.category : editing?.category ? [editing.category as unknown as string] : []
-  )
+  const [categories, setCategories] = useState<string[]>(() => {
+    const raw: unknown = editing?.category
+    if (!raw) return []
+    if (Array.isArray(raw)) return raw as string[]
+    if (typeof raw === 'string' && raw.startsWith('[')) {
+      try { return JSON.parse(raw) as string[] } catch { /* fall through */ }
+    }
+    return typeof raw === 'string' ? [raw] : []
+  })
   const [sizes, setSizes] = useState<string[]>(editing?.sizes ?? [])
   const [colors, setColors] = useState<string[]>(editing?.colors ?? [])
   // existing URLs when editing (not re-uploaded files)
@@ -672,7 +678,12 @@ export default function AdminPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-[#180A10] line-clamp-1">{p.name}</p>
                       <p className="text-xs text-[#C85880] font-bold">S/ {p.price.toFixed(2)}</p>
-                      <p className="text-[10px] text-[#180A10]/40">{(Array.isArray(p.category) ? p.category : [p.category].filter(Boolean)).join(', ')}</p>
+                      <p className="text-[10px] text-[#180A10]/40">{(
+                        Array.isArray(p.category) ? p.category
+                        : typeof p.category === 'string' && (p.category as string).startsWith('[')
+                          ? (() => { try { return JSON.parse(p.category as string) } catch { return [p.category] } })()
+                          : [p.category].filter(Boolean)
+                      ).join(', ')}</p>
                     </div>
                     {/* Edit + Delete */}
                     <div className="flex gap-1.5 flex-shrink-0">

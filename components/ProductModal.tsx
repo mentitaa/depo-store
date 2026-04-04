@@ -43,7 +43,11 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
   }
 
   const images = product.image_urls ?? []
-  const categories = Array.isArray(product.category) ? product.category : [product.category].filter(Boolean)
+  const categories: string[] = Array.isArray(product.category)
+    ? product.category
+    : typeof product.category === 'string' && (product.category as string).startsWith('[')
+      ? (() => { try { return JSON.parse(product.category as string) } catch { return [product.category as string] } })()
+      : [product.category as string].filter(Boolean)
   const imgBg = CATEGORY_BG[categories[0]] ?? '#F0D4DC'
 
   function prev() {
