@@ -17,7 +17,7 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
           <strong>Trujillo y alrededores (mismo día):</strong> Huanchaco, El Milagro, Florencia de Mora, Víctor Larco y Moche.
         </span>
         <span style={{ display: 'block', marginBottom: 6 }}>
-          <strong>Valle y provincia (1-2 días vía Tres Ases o Shalom):</strong> Virú, Otuzco, Chocope, Casa Grande, Paiján, Ascope, Pacasmayo y San Pedro de Lloc.
+          <strong>Valle y provincia (1–2 días vía Diez Ases o Shalom):</strong> Virú, Otuzco, Chocope, Casa Grande, Paiján, Ascope, Pacasmayo y San Pedro de Lloc.
         </span>
         ¿No ves tu ciudad? Escríbenos por WhatsApp y coordinamos.
       </span>
@@ -25,11 +25,11 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
   },
   {
     q: '¿Puedo hacer devoluciones?',
-    a: 'Cada prenda pasa por revisión antes de salir. No encontrarás fallas — pero si en algún caso excepcional ocurre algo, lo coordinamos contigo en privado. Por temas de gusto o decisión de compra, no realizamos devoluciones.',
+    a: 'Cada prenda pasa por revisión antes de salir. No encontrarás fallas; pero si en algún caso excepcional ocurre algo, lo coordinamos contigo en privado. Por temas de gusto o decisión de compra, no realizamos devoluciones.',
   },
   {
     q: '¿Cómo puedo pagar?',
-    a: 'Con tarjeta mediante Culqi, o con Yape, Plin o Dale. No se aceptan pagos contra entrega.',
+    a: 'Por el momento aceptamos Yape, Plin y Dale. Próximamente habilitaremos pago con tarjeta mediante Culqi. No se aceptan pagos contra entrega.',
   },
   {
     q: '¿El precio incluye el envío?',
@@ -39,7 +39,7 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
         <span style={{ display: 'block', marginBottom: 6 }}>
           <strong>Trujillo y alrededores:</strong> el pedido llega mediante un motorizado de InDriver y pagas el costo del envío al recibirlo.
         </span>
-        <strong>Valle y provincia:</strong> enviamos por Tres Ases o Shalom bajo la modalidad &quot;paga el destinatario&quot;, es decir, cancelas el envío directamente al recoger tu paquete en la agencia.
+        <strong>Valle y provincia:</strong> enviamos por Diez Ases o Shalom bajo la modalidad &quot;paga el destinatario&quot;, es decir, cancelas el envío directamente al recoger tu paquete en la agencia.
       </span>
     ),
   },
