@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, CreditCard, Smartphone } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import { useCart } from '@/context/CartContext'
 import { createOrder } from '@/lib/supabase'
@@ -303,42 +303,72 @@ export default function CheckoutPage() {
                     Método de pago
                   </h2>
 
-                  {/* Culqi button */}
-                  <button
-                    type="button"
-                    onClick={() => setPayMethod('culqi')}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors text-left ${
-                      payMethod === 'culqi'
-                        ? 'border-[#C85880] bg-[#FFF0F4] text-[#C85880]'
-                        : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
-                    }`}
-                  >
-                    <CreditCard size={16} />
-                    Tarjeta crédito / débito
-                  </button>
+                  {/* Two-card grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
 
-                  {/* Yape / Plin / Dale button */}
-                  <button
-                    type="button"
-                    onClick={() => setPayMethod('yape')}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors text-left ${
-                      payMethod === 'yape'
-                        ? 'border-[#C85880] bg-[#FFF0F4] text-[#C85880]'
-                        : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/yape.png" alt="Yape" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
-                      <span style={{ display: 'none', fontSize: 13, fontWeight: 600 }}>Yape</span>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/plin.png" alt="Plin" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
-                      <span style={{ display: 'none', fontSize: 13, fontWeight: 600 }}>Plin</span>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="https://framerusercontent.com/assets/8av9TNXdPFFLbMXZqnzGQfAg3g.svg" alt="Dale" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
-                      <span style={{ display: 'none', fontSize: 13, fontWeight: 600 }}>Dale</span>
-                    </div>
-                  </button>
+                    {/* Card: Billeteras digitales */}
+                    <button
+                      type="button"
+                      onClick={() => setPayMethod('yape')}
+                      style={{
+                        border: `1px solid ${payMethod === 'yape' ? '#C85880' : '#F0D4DC'}`,
+                        background: payMethod === 'yape' ? '#FFF0F4' : '#ffffff',
+                        borderRadius: 12,
+                        padding: 16,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'border-color 0.15s, background 0.15s',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 10,
+                      }}
+                    >
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#180A10', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        Billeteras digitales
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/yape.png" alt="Yape" style={{ height: 28, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
+                        <span style={{ display: 'none', fontSize: 12, fontWeight: 700, color: '#180A10' }}>Yape</span>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/plin.png" alt="Plin" style={{ height: 28, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
+                        <span style={{ display: 'none', fontSize: 12, fontWeight: 700, color: '#180A10' }}>Plin</span>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="https://framerusercontent.com/assets/8av9TNXdPFFLbMXZqnzGQfAg3g.svg" alt="Dale" style={{ height: 28, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
+                        <span style={{ display: 'none', fontSize: 12, fontWeight: 700, color: '#180A10' }}>Dale</span>
+                      </div>
+                    </button>
+
+                    {/* Card: Tarjeta crédito/débito */}
+                    <button
+                      type="button"
+                      onClick={() => setPayMethod('culqi')}
+                      style={{
+                        border: `1px solid ${payMethod === 'culqi' ? '#C85880' : '#F0D4DC'}`,
+                        background: payMethod === 'culqi' ? '#FFF0F4' : '#ffffff',
+                        borderRadius: 12,
+                        padding: 16,
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'border-color 0.15s, background 0.15s',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 10,
+                      }}
+                    >
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#180A10', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        Tarjeta crédito / débito
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
+                        <span style={{ display: 'none', fontSize: 12, fontWeight: 700, color: '#180A10' }}>Visa</span>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
+                        <span style={{ display: 'none', fontSize: 12, fontWeight: 700, color: '#180A10' }}>Mastercard</span>
+                      </div>
+                    </button>
+                  </div>
 
                   {payMethod === 'culqi' && (
                     <p className="text-xs text-[#180A10]/40 leading-relaxed">
