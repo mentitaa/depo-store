@@ -457,7 +457,7 @@ export default function AdminPage() {
   async function sendOrderEmail(order: Order, type: 'order_confirmed' | 'order_shipped' | 'order_cancelled') {
     if (!order.customer_email) return
     const product = order.product as Product | undefined
-    fetch('/api/email', {
+    fetch('/api/send-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -513,7 +513,10 @@ export default function AdminPage() {
     )
   }
 
-  const pendingCount = orders.filter(o => o.status === 'pendiente').length
+  const pendingCount   = orders.filter(o => o.status === 'pendiente').length
+  const shippedCount   = orders.filter(o => o.status === 'enviado').length
+  const cancelledCount = orders.filter(o => o.status === 'cancelado').length
+  const activeCount    = pendingCount + shippedCount
 
   return (
     <div className="min-h-dvh bg-[#FFF8FA]">
@@ -550,17 +553,20 @@ export default function AdminPage() {
         {/* ── LEFT: Orders ──────────────────────────────────── */}
         <div>
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
             {[
-              { label: 'Total pedidos', value: orders.length },
-              { label: 'Pendientes',    value: pendingCount,                                    highlight: pendingCount > 0 },
-              { label: 'Enviados',      value: orders.filter(o => o.status === 'enviado').length },
+              { label: 'Total activos',  value: activeCount,    highlight: false },
+              { label: 'Pendientes',     value: pendingCount,   highlight: pendingCount > 0 },
+              { label: 'Enviados',       value: shippedCount,   highlight: false },
+              { label: 'Cancelados',     value: cancelledCount, highlight: false, red: cancelledCount > 0 },
             ].map(stat => (
               <div
                 key={stat.label}
-                className={`bg-white rounded-2xl border p-4 ${stat.highlight ? 'border-[#C85880]' : 'border-[#F0D4DC]'}`}
+                className={`bg-white rounded-2xl border p-4 ${
+                  stat.highlight ? 'border-[#C85880]' : stat.red ? 'border-red-200' : 'border-[#F0D4DC]'
+                }`}
               >
-                <p className="text-2xl font-bold text-[#180A10]">{stat.value}</p>
+                <p className={`text-2xl font-bold ${stat.red ? 'text-red-500' : 'text-[#180A10]'}`}>{stat.value}</p>
                 <p className="text-xs text-[#180A10]/50 mt-0.5">{stat.label}</p>
               </div>
             ))}
