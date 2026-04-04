@@ -27,7 +27,7 @@ export default function Navbar() {
       <div className="flex items-center" style={{ gap: 12 }}>
         <Link
           href="/faq"
-          className="hidden sm:block transition-opacity hover:opacity-70 flex-shrink-0"
+          className="transition-opacity hover:opacity-70 flex-shrink-0"
           style={{ ...MONO, fontSize: 13, fontWeight: 700, color: '#C85880', whiteSpace: 'nowrap' }}
         >
           // ¿tienes dudas?
