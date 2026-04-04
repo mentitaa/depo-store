@@ -5,8 +5,16 @@ import CartDrawer from '@/components/CartDrawer'
 import PoweredBy from '@/components/PoweredBy'
 
 export const metadata: Metadata = {
-  title: 'Anora — Ropa femenina en Trujillo',
-  description: 'Tienda de ropa femenina con stock disponible ya en Trujillo, Perú.',
+  title: 'Anora✨ — Ropa femenina en Trujillo',
+  description: 'Sin esperas, lo que ves, lo tienes hoy. Ropa femenina con entrega inmediata en Trujillo, Perú.',
+  openGraph: {
+    title: 'Anora✨ — Ropa femenina en Trujillo',
+    description: 'Sin esperas, lo que ves, lo tienes hoy.',
+    url: 'https://anora.vercel.app',
+    siteName: 'Anora',
+    locale: 'es_PE',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
