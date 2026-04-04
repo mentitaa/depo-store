@@ -39,7 +39,7 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
         <span style={{ display: 'block', marginBottom: 6 }}>
           <strong>Trujillo y alrededores:</strong> el pedido llega mediante un motorizado de InDriver y pagas el costo del envío al recibirlo.
         </span>
-        <strong>Valle y provincia:</strong> enviamos por Diez Ases o Shalom bajo la modalidad &quot;paga el destinatario&quot;, es decir, cancelas el envío directamente al recoger tu paquete en la agencia.
+        <strong>Valle y provincia:</strong>{' '}enviamos por Diez Ases o Shalom bajo la modalidad &quot;paga el destinatario&quot;, es decir, cancelas el envío directamente al recoger tu paquete en la agencia.
       </span>
     ),
   },
