@@ -329,10 +329,10 @@ export default function CheckoutPage() {
                   >
                     <div className="flex items-center gap-2">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Yape_logo.svg/1200px-Yape_logo.svg.png" alt="Yape" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
+                      <img src="/yape.png" alt="Yape" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
                       <span style={{ display: 'none', fontSize: 13, fontWeight: 600 }}>Yape</span>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Plin_logo.svg/1200px-Plin_logo.svg.png" alt="Plin" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
+                      <img src="/plin.png" alt="Plin" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
                       <span style={{ display: 'none', fontSize: 13, fontWeight: 600 }}>Plin</span>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src="https://framerusercontent.com/assets/8av9TNXdPFFLbMXZqnzGQfAg3g.svg" alt="Dale" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
