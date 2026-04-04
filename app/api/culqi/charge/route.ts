@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       currency_code: 'PEN',
       email,
       source_id: token,
-      description: description ?? 'Pedido DEPO',
+      description: description ?? 'Pedido Anora',
       capture: true,
     }),
   })

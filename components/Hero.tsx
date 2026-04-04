@@ -81,7 +81,7 @@ export default function Hero() {
             margin: 0,
           }}
         >
-          Mi DEPO📦
+          Anora✨
         </h1>
 
         {/* Rack animation */}

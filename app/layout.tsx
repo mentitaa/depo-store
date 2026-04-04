@@ -5,7 +5,7 @@ import CartDrawer from '@/components/CartDrawer'
 import PoweredBy from '@/components/PoweredBy'
 
 export const metadata: Metadata = {
-  title: 'DEPO — Ropa femenina en Trujillo',
+  title: 'Anora — Ropa femenina en Trujillo',
   description: 'Tienda de ropa femenina con stock disponible ya en Trujillo, Perú.',
 }
 

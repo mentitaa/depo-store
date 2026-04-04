@@ -19,7 +19,7 @@ export default function Navbar() {
       {/* Logo */}
       <Link href="/" className="flex items-center select-none flex-shrink-0" style={{ gap: 4 }}>
         <span style={{ ...MONO, fontWeight: 700, fontSize: 15, color: '#180A10', lineHeight: 1, whiteSpace: 'nowrap' }}>
-          Mi DEPO📦
+          Anora✨
         </span>
       </Link>
 

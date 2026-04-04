@@ -478,7 +478,7 @@ export default function AdminPage() {
             className="text-xl tracking-[0.3em] text-[#180A10] select-none"
             style={{ fontFamily: 'Georgia, serif' }}
           >
-            DEPO
+            Anora
           </span>
           <span className="text-[11px] text-[#180A10]/40 border border-[#F0D4DC] rounded-full px-2 py-0.5">
             Admin

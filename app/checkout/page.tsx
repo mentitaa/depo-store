@@ -73,7 +73,7 @@ export default function CheckoutPage() {
             token: culqiToken,
             amount: Math.round(totalPrice * 100), // centavos
             email: 'cliente@midepo.pe',
-            description: `Pedido DEPO — ${form.name}`,
+            description: `Pedido Anora — ${form.name}`,
           }),
         })
         if (!res.ok) {
@@ -111,7 +111,7 @@ export default function CheckoutPage() {
     }
     window.Culqi.publicKey = process.env.NEXT_PUBLIC_CULQI_PUBLIC_KEY ?? ''
     window.Culqi.settings({
-      title: 'DEPO',
+      title: 'Anora',
       currency: 'PEN',
       amount: Math.round(totalPrice * 100),
       description: `Pedido — ${form.name || 'cliente'}`,
