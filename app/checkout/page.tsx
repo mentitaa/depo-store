@@ -303,24 +303,42 @@ export default function CheckoutPage() {
                     Método de pago
                   </h2>
 
-                  {([
-                    { value: 'culqi', label: 'Tarjeta crédito / débito', icon: <CreditCard size={16} /> },
-                    { value: 'yape',  label: 'Yape / Plin / Dale',       icon: <Smartphone size={16} /> },
-                  ] as const).map(opt => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setPayMethod(opt.value)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors text-left ${
-                        payMethod === opt.value
-                          ? 'border-[#C85880] bg-[#FFF0F4] text-[#C85880]'
-                          : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
-                      }`}
-                    >
-                      {opt.icon}
-                      {opt.label}
-                    </button>
-                  ))}
+                  {/* Culqi button */}
+                  <button
+                    type="button"
+                    onClick={() => setPayMethod('culqi')}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors text-left ${
+                      payMethod === 'culqi'
+                        ? 'border-[#C85880] bg-[#FFF0F4] text-[#C85880]'
+                        : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
+                    }`}
+                  >
+                    <CreditCard size={16} />
+                    Tarjeta crédito / débito
+                  </button>
+
+                  {/* Yape / Plin / Dale button */}
+                  <button
+                    type="button"
+                    onClick={() => setPayMethod('yape')}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-colors text-left ${
+                      payMethod === 'yape'
+                        ? 'border-[#C85880] bg-[#FFF0F4] text-[#C85880]'
+                        : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Yape_logo.svg/1200px-Yape_logo.svg.png" alt="Yape" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
+                      <span style={{ display: 'none', fontSize: 13, fontWeight: 600 }}>Yape</span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Plin_logo.svg/1200px-Plin_logo.svg.png" alt="Plin" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
+                      <span style={{ display: 'none', fontSize: 13, fontWeight: 600 }}>Plin</span>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="https://framerusercontent.com/assets/8av9TNXdPFFLbMXZqnzGQfAg3g.svg" alt="Dale" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
+                      <span style={{ display: 'none', fontSize: 13, fontWeight: 600 }}>Dale</span>
+                    </div>
+                  </button>
 
                   {payMethod === 'culqi' && (
                     <p className="text-xs text-[#180A10]/40 leading-relaxed">
