@@ -96,9 +96,8 @@ export default function CheckoutPage() {
         })
       }
 
-      // Send confirmation email if provided
-      if (form.email) {
-        fetch('/api/email', {
+      // Send confirmation email
+      fetch('/api/email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -116,7 +115,6 @@ export default function CheckoutPage() {
             address: form.address,
           }),
         }).catch(err => console.error('[Checkout] Email error:', err))
-      }
 
       clearCart()
       router.push('/checkout/confirmacion')
@@ -243,10 +241,10 @@ export default function CheckoutPage() {
                   {/* Email */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs text-[#180A10]/50 font-medium" htmlFor="email">
-                      Correo electrónico <span className="text-[#180A10]/30">(opcional — para recibir confirmación)</span>
+                      Correo electrónico
                     </label>
                     <input
-                      id="email" name="email" type="email"
+                      id="email" name="email" type="email" required
                       value={form.email} onChange={handleChange}
                       placeholder="maria@gmail.com"
                       className="w-full px-4 py-2.5 rounded-xl border border-[#F0D4DC] text-sm text-[#180A10] bg-[#FFF8FA] focus:outline-none focus:border-[#C85880] transition-colors"

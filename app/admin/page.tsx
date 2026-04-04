@@ -478,24 +478,31 @@ export default function AdminPage() {
   }
 
   async function handleMarkSent(id: string) {
-    await updateOrderStatus(id, 'enviado')
-    setOrders(prev => {
-      const updated = prev.map(o => o.id === id ? { ...o, status: 'enviado' as const } : o)
-      const order = updated.find(o => o.id === id)
+    try {
+      await updateOrderStatus(id, 'enviado')
+      console.log('[Admin] Pedido marcado como enviado:', id)
+      const order = orders.find(o => o.id === id)
       if (order) sendOrderEmail(order, 'order_shipped')
-      return updated
-    })
+      await fetchOrders()
+    } catch (err) {
+      console.error('[Admin] Error al marcar enviado:', err)
+      alert('Error al actualizar el pedido: ' + (err instanceof Error ? err.message : JSON.stringify(err)))
+    }
   }
 
   async function handleCancelOrder(id: string) {
     if (!confirm('¿Estás segura? El pedido será cancelado.')) return
-    await updateOrderStatus(id, 'cancelado')
-    setOrders(prev => {
-      const updated = prev.map(o => o.id === id ? { ...o, status: 'cancelado' as const } : o)
-      const order = updated.find(o => o.id === id)
+    try {
+      console.log('[Admin] Cancelando pedido:', id)
+      await updateOrderStatus(id, 'cancelado')
+      console.log('[Admin] Pedido cancelado exitosamente:', id)
+      const order = orders.find(o => o.id === id)
       if (order) sendOrderEmail(order, 'order_cancelled')
-      return updated
-    })
+      await fetchOrders()
+    } catch (err) {
+      console.error('[Admin] Error al cancelar pedido:', err)
+      alert('Error al cancelar el pedido: ' + (err instanceof Error ? err.message : JSON.stringify(err)))
+    }
   }
 
   if (checkingAuth) {
