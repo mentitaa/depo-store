@@ -4,8 +4,8 @@ export default function PoweredBy() {
       style={{
         background: '#ffffff',
         borderTop: '0.5px solid #F0D4DC',
-        paddingTop: 24,
-        paddingBottom: 24,
+        paddingTop: 10,
+        paddingBottom: 10,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
