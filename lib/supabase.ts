@@ -65,7 +65,7 @@ export async function createOrder(order: Omit<Order, 'id' | 'created_at' | 'prod
   return data as Order
 }
 
-export async function updateOrderStatus(id: string, status: 'pendiente' | 'enviado') {
+export async function updateOrderStatus(id: string, status: 'pendiente' | 'enviado' | 'cancelado') {
   const { error } = await supabase.from('orders').update({ status }).eq('id', id)
   if (error) throw error
 }

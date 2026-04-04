@@ -27,7 +27,7 @@ declare global {
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, totalPrice, clearCart } = useCart()
-  const [form, setForm] = useState({ name: '', phone: '', address: '', reference: '' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', reference: '' })
   const [payMethod, setPayMethod] = useState<PayMethod>('culqi')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -72,7 +72,7 @@ export default function CheckoutPage() {
           body: JSON.stringify({
             token: culqiToken,
             amount: Math.round(totalPrice * 100), // centavos
-            email: 'cliente@midepo.pe',
+            email: form.email,
             description: `Pedido Anora — ${form.name}`,
           }),
         })
@@ -85,6 +85,7 @@ export default function CheckoutPage() {
       for (const item of items) {
         await createOrder({
           customer_name: form.name,
+          customer_email: form.email || undefined,
           phone: `+51${form.phone.replace(/\s/g, '')}`,
           address: form.address,
           reference: form.reference || undefined,
@@ -93,6 +94,28 @@ export default function CheckoutPage() {
           color: item.color,
           status: 'pendiente',
         })
+      }
+
+      // Send confirmation email if provided
+      if (form.email) {
+        fetch('/api/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'order_confirmed',
+            to: form.email,
+            customerName: form.name,
+            items: items.map(i => ({
+              name: i.product.name,
+              size: i.size,
+              color: i.color,
+              quantity: i.quantity,
+              price: i.product.price,
+            })),
+            total: totalPrice,
+            address: form.address,
+          }),
+        }).catch(err => console.error('[Checkout] Email error:', err))
       }
 
       clearCart()
@@ -213,6 +236,19 @@ export default function CheckoutPage() {
                       id="name" name="name" type="text" required
                       value={form.name} onChange={handleChange}
                       placeholder="María García"
+                      className="w-full px-4 py-2.5 rounded-xl border border-[#F0D4DC] text-sm text-[#180A10] bg-[#FFF8FA] focus:outline-none focus:border-[#C85880] transition-colors"
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs text-[#180A10]/50 font-medium" htmlFor="email">
+                      Correo electrónico <span className="text-[#180A10]/30">(opcional — para recibir confirmación)</span>
+                    </label>
+                    <input
+                      id="email" name="email" type="email"
+                      value={form.email} onChange={handleChange}
+                      placeholder="maria@gmail.com"
                       className="w-full px-4 py-2.5 rounded-xl border border-[#F0D4DC] text-sm text-[#180A10] bg-[#FFF8FA] focus:outline-none focus:border-[#C85880] transition-colors"
                     />
                   </div>

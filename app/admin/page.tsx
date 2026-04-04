@@ -454,9 +454,48 @@ export default function AdminPage() {
     router.replace('/admin/login')
   }
 
+  async function sendOrderEmail(order: Order, type: 'order_confirmed' | 'order_shipped' | 'order_cancelled') {
+    if (!order.customer_email) return
+    const product = order.product as Product | undefined
+    fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type,
+        to: order.customer_email,
+        customerName: order.customer_name,
+        items: [{
+          name: product?.name ?? 'Producto',
+          size: order.size,
+          color: order.color,
+          quantity: 1,
+          price: product?.price ?? 0,
+        }],
+        total: product?.price ?? 0,
+        address: order.address,
+      }),
+    }).catch(err => console.error('[Admin] Email error:', err))
+  }
+
   async function handleMarkSent(id: string) {
     await updateOrderStatus(id, 'enviado')
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: 'enviado' } : o))
+    setOrders(prev => {
+      const updated = prev.map(o => o.id === id ? { ...o, status: 'enviado' as const } : o)
+      const order = updated.find(o => o.id === id)
+      if (order) sendOrderEmail(order, 'order_shipped')
+      return updated
+    })
+  }
+
+  async function handleCancelOrder(id: string) {
+    if (!confirm('¿Estás segura? El pedido será cancelado.')) return
+    await updateOrderStatus(id, 'cancelado')
+    setOrders(prev => {
+      const updated = prev.map(o => o.id === id ? { ...o, status: 'cancelado' as const } : o)
+      const order = updated.find(o => o.id === id)
+      if (order) sendOrderEmail(order, 'order_cancelled')
+      return updated
+    })
   }
 
   if (checkingAuth) {
@@ -543,14 +582,16 @@ export default function AdminPage() {
                 <div
                   key={order.id}
                   className={`bg-white rounded-2xl border p-4 flex flex-col sm:flex-row sm:items-center gap-3 transition-opacity ${
-                    order.status === 'enviado' ? 'opacity-50 border-[#F0D4DC]' : 'border-[#F0D4DC]'
+                    order.status !== 'pendiente' ? 'opacity-50 border-[#F0D4DC]' : 'border-[#F0D4DC]'
                   }`}
                 >
                   {/* Badge */}
                   <span className={`self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide flex-shrink-0 ${
                     order.status === 'pendiente'
-                      ? 'bg-[#FFF0F4] text-[#C85880] border border-[#C85880]'
-                      : 'bg-[#F0D4DC] text-[#180A10]/50'
+                      ? 'bg-yellow-50 text-yellow-600 border border-yellow-300'
+                      : order.status === 'enviado'
+                        ? 'bg-green-50 text-green-600 border border-green-300'
+                        : 'bg-red-50 text-red-500 border border-red-200'
                   }`}>
                     {order.status}
                   </span>
@@ -563,6 +604,9 @@ export default function AdminPage() {
                     </p>
                     <p className="text-xs text-[#180A10]/40 mt-0.5 line-clamp-1">{order.address}</p>
                     <p className="text-xs text-[#180A10]/40">{order.phone}</p>
+                    {order.customer_email && (
+                      <p className="text-xs text-[#180A10]/30">{order.customer_email}</p>
+                    )}
                   </div>
 
                   {/* Date */}
@@ -573,13 +617,21 @@ export default function AdminPage() {
                   </p>
 
                   {order.status === 'pendiente' && (
-                    <button
-                      onClick={() => handleMarkSent(order.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#C85880] text-white text-xs font-semibold hover:bg-[#a8446a] transition-colors flex-shrink-0"
-                    >
-                      <PackageCheck size={13} />
-                      Marcar enviado
-                    </button>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => handleMarkSent(order.id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#C85880] text-white text-xs font-semibold hover:bg-[#a8446a] transition-colors"
+                      >
+                        <PackageCheck size={13} />
+                        Marcar enviado
+                      </button>
+                      <button
+                        onClick={() => handleCancelOrder(order.id)}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-red-200 text-red-500 text-xs font-semibold hover:bg-red-50 transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}

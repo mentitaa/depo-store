@@ -33,7 +33,8 @@ create table if not exists orders (
   product_id     uuid not null references products(id) on delete restrict,
   size           text not null,
   color          text not null,
-  status         text not null default 'pendiente' check (status in ('pendiente', 'enviado')),
+  customer_email text,
+  status         text not null default 'pendiente' check (status in ('pendiente', 'enviado', 'cancelado')),
   created_at     timestamptz not null default now()
 );
 
@@ -126,3 +127,12 @@ create policy "product_images_admin_delete"
   on storage.objects for delete
   to authenticated
   using (bucket_id = 'product-images');
+
+-- ─────────────────────────────────────────────────────────────
+-- MIGRATION: cancelado status + customer_email
+-- Ejecutar si la tabla orders ya existe en producción
+-- ─────────────────────────────────────────────────────────────
+-- alter table orders add column if not exists customer_email text;
+-- alter table orders drop constraint if exists orders_status_check;
+-- alter table orders add constraint orders_status_check
+--   check (status in ('pendiente', 'enviado', 'cancelado'));
