@@ -3,6 +3,7 @@ import './globals.css'
 import { CartProvider } from '@/context/CartContext'
 import CartDrawer from '@/components/CartDrawer'
 import PoweredBy from '@/components/PoweredBy'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export const metadata: Metadata = {
   title: 'Anora✨ — Ropa femenina en Trujillo',
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
           <CartDrawer />
         </CartProvider>
+        <SpeedInsights />
       </body>
     </html>
   )
