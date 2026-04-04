@@ -28,7 +28,7 @@ export default function CheckoutPage() {
   const router = useRouter()
   const { items, totalPrice, clearCart, updateQuantity, removeItem } = useCart()
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', reference: '' })
-  const [payMethod, setPayMethod] = useState<PayMethod>('culqi')
+  const [payMethod, setPayMethod] = useState<PayMethod>('yape')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const culqiReady = useRef(false)
@@ -367,35 +367,46 @@ export default function CheckoutPage() {
                       </div>
                     </button>
 
-                    {/* Card: Tarjeta crédito/débito */}
-                    <button
-                      type="button"
-                      onClick={() => setPayMethod('culqi')}
+                    {/* Card: Tarjeta crédito/débito — disabled */}
+                    <div
                       style={{
-                        border: `1px solid ${payMethod === 'culqi' ? '#C85880' : '#F0D4DC'}`,
-                        background: payMethod === 'culqi' ? '#FFF0F4' : '#ffffff',
+                        border: '1px solid #E0E0E0',
+                        background: '#F5F5F5',
                         borderRadius: 12,
                         padding: 16,
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'border-color 0.15s, background 0.15s',
+                        pointerEvents: 'none',
+                        position: 'relative',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 10,
                       }}
                     >
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#180A10', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      <span style={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: '#999999',
+                        background: '#E8E8E8',
+                        borderRadius: 20,
+                        padding: '2px 8px',
+                        letterSpacing: '0.04em',
+                      }}>
+                        Próximamente
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#AAAAAA', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                         Tarjeta crédito / débito
                       </span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, opacity: 0.4 }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
-                        <span style={{ display: 'none', fontSize: 12, fontWeight: 700, color: '#180A10' }}>Visa</span>
+                        <span style={{ display: 'none', fontSize: 12, fontWeight: 700, color: '#AAAAAA' }}>Visa</span>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" style={{ height: 24, width: 'auto', objectFit: 'contain' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement).style.display = 'inline' }} />
-                        <span style={{ display: 'none', fontSize: 12, fontWeight: 700, color: '#180A10' }}>Mastercard</span>
+                        <span style={{ display: 'none', fontSize: 12, fontWeight: 700, color: '#AAAAAA' }}>Mastercard</span>
                       </div>
-                    </button>
+                    </div>
                   </div>
 
                   {payMethod === 'culqi' && (
