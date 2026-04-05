@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, X } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import { useCart } from '@/context/CartContext'
-import { createOrder } from '@/lib/supabase'
+import { createOrder, decrementStock } from '@/lib/supabase'
 
 type PayMethod = 'culqi' | 'yape'
 
@@ -99,6 +99,10 @@ export default function CheckoutPage() {
           color: item.color,
           status: 'pendiente',
         })
+        // Decrement stock — fire and forget, don't block order confirmation
+        decrementStock(item.product.id, item.quantity).catch(err =>
+          console.error('[Checkout] Error decrementando stock:', err)
+        )
       }
 
       // Send confirmation email

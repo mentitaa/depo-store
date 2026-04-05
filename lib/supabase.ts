@@ -70,6 +70,21 @@ export async function updateOrderStatus(id: string, status: 'pendiente' | 'envia
   if (error) throw error
 }
 
+export async function decrementStock(productId: string, quantity: number) {
+  const { data, error: readErr } = await supabase
+    .from('products')
+    .select('stock')
+    .eq('id', productId)
+    .single()
+  if (readErr) throw readErr
+  const newStock = Math.max(0, (data.stock as number) - quantity)
+  const { error } = await supabase
+    .from('products')
+    .update({ stock: newStock })
+    .eq('id', productId)
+  if (error) throw error
+}
+
 export async function deleteProduct(id: string) {
   const { error } = await supabase.from('products').delete().eq('id', id)
   if (error) throw error

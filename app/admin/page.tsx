@@ -679,7 +679,14 @@ export default function AdminPage() {
                     </div>
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-[#180A10] line-clamp-1">{p.name}</p>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <p className="text-xs font-semibold text-[#180A10] line-clamp-1">{p.name}</p>
+                        {p.stock === 0 ? (
+                          <span className="text-[9px] font-bold bg-red-100 text-red-500 px-1.5 py-0.5 rounded-full flex-shrink-0">Sin stock</span>
+                        ) : (
+                          <span className="text-[9px] font-bold bg-[#F0D4DC] text-[#C85880] px-1.5 py-0.5 rounded-full flex-shrink-0">stock: {p.stock}</span>
+                        )}
+                      </div>
                       <p className="text-xs text-[#C85880] font-bold">S/ {p.price.toFixed(2)}</p>
                       <p className="text-[10px] text-[#180A10]/40">{normalizeCats(p.category).join(', ')}</p>
                     </div>

@@ -10,18 +10,24 @@ interface Props {
 
 export default function ProductCard({ product, onClick }: Props) {
   const { addItem, openCart } = useCart()
+  const outOfStock = product.stock === 0
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.stopPropagation()
-    if (product.stock === 0) return
+    if (outOfStock) return
     addItem(product, product.sizes[0] ?? '', product.colors[0] ?? '')
     openCart()
   }
 
   return (
     <div
-      onClick={onClick}
-      className="group bg-white rounded-2xl overflow-hidden border border-[#F0D4DC] text-left transition-all duration-200 hover:border-[#C85880] hover:shadow-md cursor-pointer relative"
+      onClick={outOfStock ? undefined : onClick}
+      className="group bg-white rounded-2xl overflow-hidden border border-[#F0D4DC] text-left transition-all duration-200 hover:border-[#C85880] hover:shadow-md relative"
+      style={{
+        opacity: outOfStock ? 0.6 : 1,
+        pointerEvents: outOfStock ? 'none' : 'auto',
+        cursor: outOfStock ? 'default' : 'pointer',
+      }}
     >
       {/* Image — 280px fixed, contain */}
       <div className="w-full overflow-hidden flex items-center justify-center relative" style={{ height: 280, background: '#FFF8FA' }}>
@@ -36,9 +42,11 @@ export default function ProductCard({ product, onClick }: Props) {
         ) : (
           <span className="text-5xl transition-transform duration-300 group-hover:scale-105">👗</span>
         )}
-        {product.stock === 0 && (
-          <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-            <span className="text-xs font-bold text-[#180A10]/50 uppercase tracking-widest">Agotado</span>
+        {outOfStock && (
+          <div className="absolute inset-0 flex items-start justify-end p-2">
+            <span className="text-[10px] font-bold bg-red-500 text-white uppercase tracking-wider px-2 py-0.5 rounded-full">
+              Agotado
+            </span>
           </div>
         )}
       </div>
