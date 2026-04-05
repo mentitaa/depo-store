@@ -59,6 +59,7 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
     stock: editing?.stock?.toString() ?? '1',
     availableFrom: editing?.available_from ?? '',
   })
+  const [featured, setFeatured] = useState<boolean>((editing?.priority ?? 0) === 1)
   const [categories, setCategories] = useState<string[]>(() => normalizeCats(editing?.category))
   const [sizes, setSizes] = useState<string[]>(editing?.sizes ?? [])
   const [colors, setColors] = useState<string[]>(editing?.colors ?? [])
@@ -139,6 +140,7 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
         sizes,
         colors,
         available_from: form.availableFrom || null,
+        priority: featured ? 1 : 0,
       }
       console.log('[Admin] Payload completo a enviar:', JSON.stringify(payload, null, 2))
       console.log('[Admin] colors tipo:', typeof payload.colors, '| valor:', payload.colors)
@@ -155,6 +157,7 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
 
       // Reset form
       setForm({ name: '', price: '', stock: '1', availableFrom: '' })
+      setFeatured(false)
       setCategories([])
       setSizes([])
       setColors([])
@@ -342,6 +345,40 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
             onChange={e => setForm(p => ({ ...p, stock: e.target.value }))}
             className="px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA]"
           />
+        </div>
+
+        {/* Featured toggle */}
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#180A10]/50 font-medium">Destacar producto</span>
+          <button
+            type="button"
+            onClick={() => setFeatured(p => !p)}
+            style={{
+              width: 40,
+              height: 22,
+              borderRadius: 999,
+              background: featured ? '#C85880' : '#E5D0D8',
+              border: 'none',
+              padding: 2,
+              cursor: 'pointer',
+              transition: 'background 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <span
+              style={{
+                width: 18,
+                height: 18,
+                borderRadius: '50%',
+                background: '#ffffff',
+                display: 'block',
+                transform: featured ? 'translateX(18px)' : 'translateX(0)',
+                transition: 'transform 0.2s',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+              }}
+            />
+          </button>
         </div>
 
         {/* Available from */}
@@ -877,6 +914,9 @@ export default function AdminPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <p className="text-xs font-semibold text-[#180A10] line-clamp-1">{p.name}</p>
+                        {p.priority === 1 && (
+                          <span className="text-[11px] flex-shrink-0" title="Destacado">⭐</span>
+                        )}
                         {p.stock === 0 ? (
                           <span className="text-[9px] font-bold bg-red-100 text-red-500 px-1.5 py-0.5 rounded-full flex-shrink-0">Sin stock</span>
                         ) : (

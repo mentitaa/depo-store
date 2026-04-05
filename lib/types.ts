@@ -10,6 +10,7 @@ export interface Product {
   colors: string[]
   image_urls: string[]
   stock: number
+  priority?: number
   available_from?: string | null
   created_at: string
 }

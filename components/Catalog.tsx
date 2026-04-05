@@ -59,6 +59,9 @@ export default function Catalog({ initialProducts = [] }: Props) {
   })
 
   const sorted = [...filtered].sort((a, b) => {
+    const pa = a.priority ?? 0
+    const pb = b.priority ?? 0
+    if (pb !== pa) return pb - pa
     if (sortBy === 'precio-asc') return a.price - b.price
     if (sortBy === 'precio-desc') return b.price - a.price
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
