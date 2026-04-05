@@ -395,6 +395,32 @@ export default function AdminPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const formRef = useRef<HTMLDivElement>(null)
 
+  // ── Order filter ───────────────────────────────────────────────────────────
+  type OrderFilterValue = 'todos' | 'pendiente' | 'enviado' | 'cancelado'
+  const [orderFilter, setOrderFilter] = useState<OrderFilterValue>('todos')
+  const [orderFilterOpen, setOrderFilterOpen] = useState(false)
+  const orderFilterRef = useRef<HTMLDivElement>(null)
+
+  // ── Product filter ─────────────────────────────────────────────────────────
+  const [productCatFilter, setProductCatFilter] = useState<string[]>([])
+  const [productStockFilter, setProductStockFilter] = useState<'todos' | 'con' | 'sin'>('todos')
+  const [productFilterOpen, setProductFilterOpen] = useState(false)
+  const productFilterRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (orderFilterRef.current && !orderFilterRef.current.contains(e.target as Node)) {
+        setOrderFilterOpen(false)
+      }
+      if (productFilterRef.current && !productFilterRef.current.contains(e.target as Node)) {
+        setProductFilterOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
   // Auth check — redirect to /admin/login if no session
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -528,6 +554,26 @@ export default function AdminPage() {
   const cancelledCount = orders.filter(o => o.status === 'cancelado').length
   const activeCount    = pendingCount + shippedCount
 
+  const filteredOrders = orderFilter === 'todos'
+    ? orders
+    : orders.filter(o => o.status === orderFilter)
+
+  const orderFilterLabels: Record<typeof orderFilter, string> = {
+    todos: 'Todos', pendiente: 'Pendientes', enviado: 'Enviados', cancelado: 'Cancelados',
+  }
+
+  const filteredProducts = products.filter(p => {
+    if (productCatFilter.length > 0) {
+      const cats = normalizeCats(p.category)
+      if (!productCatFilter.some(c => cats.includes(c))) return false
+    }
+    if (productStockFilter === 'con' && p.stock === 0) return false
+    if (productStockFilter === 'sin' && p.stock > 0) return false
+    return true
+  })
+
+  const productActiveFilters = productCatFilter.length + (productStockFilter !== 'todos' ? 1 : 0)
+
   return (
     <div className="min-h-dvh bg-[#FFF8FA]">
       {/* Header */}
@@ -584,23 +630,54 @@ export default function AdminPage() {
           {/* Orders header */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold text-[#180A10]">Pedidos en tiempo real</h2>
-            <button
-              onClick={fetchOrders}
-              disabled={loadingOrders}
-              className="flex items-center gap-1.5 text-xs text-[#180A10]/50 hover:text-[#C85880] transition-colors"
-            >
-              <RefreshCw size={13} className={loadingOrders ? 'animate-spin' : ''} />
-              Actualizar
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={fetchOrders}
+                disabled={loadingOrders}
+                className="flex items-center gap-1.5 text-xs text-[#180A10]/50 hover:text-[#C85880] transition-colors"
+              >
+                <RefreshCw size={13} className={loadingOrders ? 'animate-spin' : ''} />
+                Actualizar
+              </button>
+              {/* Order filter dropdown */}
+              <div ref={orderFilterRef} style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setOrderFilterOpen(v => !v)}
+                  className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg border border-[#F0D4DC] hover:border-[#C85880] transition-colors"
+                  style={{ color: orderFilter !== 'todos' ? '#C85880' : '#180A10' }}
+                >
+                  {orderFilter !== 'todos' ? `Filtro: ${orderFilterLabels[orderFilter]}` : 'Filtrar'}
+                </button>
+                {orderFilterOpen && (
+                  <div className="absolute right-0 top-8 z-30 bg-white border border-[#F0D4DC] rounded-xl shadow-lg py-1 min-w-[140px]">
+                    {(['todos', 'pendiente', 'enviado', 'cancelado'] as const).map(v => (
+                      <button
+                        key={v}
+                        onClick={() => { setOrderFilter(v); setOrderFilterOpen(false) }}
+                        className={`w-full text-left px-4 py-2 text-xs transition-colors hover:bg-[#FFF8FA] ${
+                          orderFilter === v ? 'text-[#C85880] font-bold' : 'text-[#180A10]'
+                        }`}
+                      >
+                        {orderFilterLabels[v]}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {orders.length === 0 ? (
             <div className="bg-white rounded-2xl border border-[#F0D4DC] p-12 text-center text-[#180A10]/40 text-sm">
               No hay pedidos aún.
             </div>
+          ) : filteredOrders.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-[#F0D4DC] p-8 text-center text-[#180A10]/40 text-sm">
+              No hay pedidos {orderFilterLabels[orderFilter].toLowerCase()}.
+            </div>
           ) : (
             <div className="flex flex-col gap-3">
-              {orders.map(order => (
+              {filteredOrders.map(order => (
                 <div
                   key={order.id}
                   className={`bg-white rounded-2xl border p-4 flex flex-col sm:flex-row sm:items-center gap-3 transition-opacity ${
@@ -661,12 +738,78 @@ export default function AdminPage() {
           )}
           {/* Mis productos */}
           <div className="bg-white rounded-2xl border border-[#F0D4DC] p-5 flex flex-col gap-4 mt-6">
-            <h2 className="text-sm font-bold text-[#180A10]">Mis productos ({products.length})</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-bold text-[#180A10]">
+                Mis productos ({filteredProducts.length}{filteredProducts.length !== products.length ? `/${products.length}` : ''})
+              </h2>
+              {/* Product filter dropdown */}
+              <div ref={productFilterRef} style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setProductFilterOpen(v => !v)}
+                  className="flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-lg border border-[#F0D4DC] hover:border-[#C85880] transition-colors"
+                  style={{ color: productActiveFilters > 0 ? '#C85880' : '#180A10' }}
+                >
+                  {productActiveFilters > 0 ? `Filtrar (${productActiveFilters})` : 'Filtrar'}
+                </button>
+                {productFilterOpen && (
+                  <div className="absolute right-0 top-8 z-30 bg-white border border-[#F0D4DC] rounded-xl shadow-lg p-4 min-w-[200px] flex flex-col gap-4">
+                    {/* Categories */}
+                    <div>
+                      <p className="text-[10px] font-bold text-[#180A10]/40 uppercase tracking-widest mb-2">Categoría</p>
+                      <div className="flex flex-col gap-1.5">
+                        {[['vestidos','Vestidos'],['deportiva','Deportivo'],['casual','Casual']].map(([val, label]) => (
+                          <label key={val} className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={productCatFilter.includes(val)}
+                              onChange={() => setProductCatFilter(prev =>
+                                prev.includes(val) ? prev.filter(c => c !== val) : [...prev, val]
+                              )}
+                              className="accent-[#C85880]"
+                            />
+                            <span className="text-xs text-[#180A10]">{label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Stock */}
+                    <div>
+                      <p className="text-[10px] font-bold text-[#180A10]/40 uppercase tracking-widest mb-2">Stock</p>
+                      <div className="flex flex-col gap-1.5">
+                        {[['todos','Todos'],['con','Con stock'],['sin','Sin stock']].map(([val, label]) => (
+                          <label key={val} className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="radio"
+                              name="stock-filter"
+                              checked={productStockFilter === val}
+                              onChange={() => setProductStockFilter(val as 'todos'|'con'|'sin')}
+                              className="accent-[#C85880]"
+                            />
+                            <span className="text-xs text-[#180A10]">{label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Clear */}
+                    {productActiveFilters > 0 && (
+                      <button
+                        onClick={() => { setProductCatFilter([]); setProductStockFilter('todos'); setProductFilterOpen(false) }}
+                        className="text-xs text-red-400 hover:text-red-600 text-left transition-colors"
+                      >
+                        Limpiar filtros
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
             {products.length === 0 ? (
               <p className="text-xs text-[#180A10]/40 text-center py-4">No hay productos aún.</p>
+            ) : filteredProducts.length === 0 ? (
+              <p className="text-xs text-[#180A10]/40 text-center py-4">Ningún producto coincide con los filtros.</p>
             ) : (
               <div className="flex flex-col gap-3">
-                {products.map(p => (
+                {filteredProducts.map(p => (
                   <div key={p.id} className="flex items-center gap-3 border border-[#F0D4DC] rounded-xl p-2">
                     {/* Thumbnail */}
                     <div className="rounded-lg overflow-hidden bg-[#FFF8FA] flex-shrink-0 flex items-center justify-center" style={{ width: 50, height: 62 }}>
