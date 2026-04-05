@@ -157,7 +157,7 @@ export default function ProductCard({ product, onClick }: Props) {
             <span
               key={c}
               className="w-3 h-3 rounded-full border border-[#F0D4DC] flex-shrink-0"
-              style={{ backgroundColor: c }}
+              style={{ background: c === 'multicolor' ? 'linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #C77DFF)' : c }}
             />
           ))}
         </div>

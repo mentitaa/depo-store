@@ -12,6 +12,7 @@ const CATEGORIES: { label: string; value: CategoryFilter }[] = [
   { label: 'Vestidos', value: 'vestidos' },
   { label: 'Deportivo', value: 'deportiva' },
   { label: 'Casual', value: 'casual' },
+  { label: 'Accesorios', value: 'accesorios' },
 ]
 
 interface Props {

@@ -6,7 +6,9 @@ import { supabase, updateOrderStatus, createProduct, updateProduct, uploadProduc
 import type { Order, Product, Category } from '@/lib/types'
 import { PackageCheck, Plus, LogOut, RefreshCw, Upload, X, Trash2, Pencil } from 'lucide-react'
 
-const SIZES_OPTIONS = ['XS', 'S', 'M', 'L', 'XL']
+const SIZES_OPTIONS = ['XS', 'S', 'M', 'L', 'XL', 'ÚNICA']
+const MULTICOLOR = 'multicolor'
+const MULTICOLOR_GRADIENT = 'linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #C77DFF)'
 const COLOR_OPTIONS = [
   { value: '#000000', label: 'Negro' },
   { value: '#ffffff', label: 'Blanco' },
@@ -16,8 +18,9 @@ const COLOR_OPTIONS = [
   { value: '#228B22', label: 'Verde' },
   { value: '#FF6347', label: 'Rojo' },
   { value: '#FFD700', label: 'Dorado' },
+  { value: MULTICOLOR, label: 'Multicolor' },
 ]
-const CATEGORIES: Category[] = ['vestidos', 'deportiva', 'casual']
+const CATEGORIES: Category[] = ['vestidos', 'deportiva', 'casual', 'accesorios']
 
 function toggle<T>(arr: T[], val: T): T[] {
   return arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val]
@@ -370,7 +373,7 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
                 onClick={() => setColors(prev => toggle(prev, value))}
                 title={label}
                 style={{
-                  backgroundColor: value,
+                  background: value === MULTICOLOR ? MULTICOLOR_GRADIENT : value,
                   boxShadow: value === '#ffffff' ? 'inset 0 0 0 1px #e5c8d0' : undefined,
                 }}
                 className={`w-7 h-7 rounded-full border-2 transition-all ${
@@ -781,7 +784,7 @@ export default function AdminPage() {
                     <div>
                       <p className="text-[10px] font-bold text-[#180A10]/40 uppercase tracking-widest mb-2">Categoría</p>
                       <div className="flex flex-col gap-1.5">
-                        {[['vestidos','Vestidos'],['deportiva','Deportivo'],['casual','Casual']].map(([val, label]) => (
+                        {[['vestidos','Vestidos'],['deportiva','Deportivo'],['casual','Casual'],['accesorios','Accesorios']].map(([val, label]) => (
                           <label key={val} className="flex items-center gap-2 cursor-pointer">
                             <input
                               type="checkbox"

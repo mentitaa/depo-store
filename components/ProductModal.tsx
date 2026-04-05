@@ -20,7 +20,9 @@ const COLOR_LABELS: Record<string, string> = {
   '#228B22': 'Verde',
   '#FF6347': 'Rojo',
   '#FFD700': 'Dorado',
+  'multicolor': 'Multicolor',
 }
+const MULTICOLOR_GRADIENT = 'linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #C77DFF)'
 
 const CATEGORY_BG: Record<string, string> = {
   vestidos:  '#F9E8EF',
@@ -182,7 +184,7 @@ export default function ProductModal({ product, isOpen, onClose }: Props) {
                         : 'border-[#F0D4DC] hover:border-[#C85880]'
                     }`}
                     style={{
-                      backgroundColor: color,
+                      background: color === 'multicolor' ? MULTICOLOR_GRADIENT : color,
                       boxShadow: color === '#ffffff' ? 'inset 0 0 0 1px #e5c8d0' : undefined,
                     }}
                   />

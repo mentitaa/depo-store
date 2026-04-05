@@ -1,4 +1,4 @@
-export type Category = 'vestidos' | 'deportiva' | 'casual'
+export type Category = 'vestidos' | 'deportiva' | 'casual' | 'accesorios'
 export type CategoryFilter = 'todos' | Category
 
 export interface Product {

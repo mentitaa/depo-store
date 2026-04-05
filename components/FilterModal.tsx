@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
 
-const ALL_SIZES = ['XS', 'S', 'M', 'L', 'XL']
+const ALL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'ÚNICA']
+const MULTICOLOR_GRADIENT = 'linear-gradient(135deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #C77DFF)'
 const PALETTE = [
   { value: '#000000', label: 'Negro' },
   { value: '#ffffff', label: 'Blanco' },
@@ -13,6 +14,7 @@ const PALETTE = [
   { value: '#228B22', label: 'Verde' },
   { value: '#FF6347', label: 'Rojo' },
   { value: '#FFD700', label: 'Dorado' },
+  { value: 'multicolor', label: 'Multicolor' },
 ]
 
 export interface FilterValues {
@@ -99,7 +101,7 @@ export default function FilterModal({ initial, onApply, onClose }: Props) {
                 style={{
                   width: 26,
                   height: 26,
-                  backgroundColor: value,
+                  background: value === 'multicolor' ? MULTICOLOR_GRADIENT : value,
                   boxShadow: value === '#ffffff' ? 'inset 0 0 0 1px #e5c8d0' : undefined,
                 }}
                 className={`rounded-full border-2 transition-all flex-shrink-0 ${
