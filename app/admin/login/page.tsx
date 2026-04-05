@@ -33,10 +33,9 @@ export default function AdminLoginPage() {
         {/* Logo */}
         <div className="text-center">
           <h1
-            className="text-3xl tracking-[0.35em] text-[#180A10] select-none"
-            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+            style={{ fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace', fontWeight: 700, fontSize: 15, color: '#180A10', margin: 0 }}
           >
-            Anora
+            Anora✨
           </h1>
           <p className="text-xs text-[#180A10]/40 mt-2 uppercase tracking-widest">
             Panel de administración

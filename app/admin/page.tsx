@@ -534,10 +534,9 @@ export default function AdminPage() {
       <header className="bg-white border-b border-[#F0D4DC] px-6 py-4 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-3">
           <span
-            className="text-xl tracking-[0.3em] text-[#180A10] select-none"
-            style={{ fontFamily: 'Georgia, serif' }}
+            style={{ fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace', fontWeight: 700, fontSize: 15, color: '#180A10' }}
           >
-            Anora
+            Anora✨
           </span>
           <span className="text-[11px] text-[#180A10]/40 border border-[#F0D4DC] rounded-full px-2 py-0.5">
             Admin
