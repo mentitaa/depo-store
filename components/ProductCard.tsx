@@ -8,64 +8,105 @@ interface Props {
   onClick: () => void
 }
 
-function formatAvailableDate(iso: string): string {
-  const d = new Date(iso)
-  const day = String(d.getDate()).padStart(2, '0')
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  return `${day}/${month}`
+/** Parse "YYYY-MM-DD" → "dd/mm" without timezone issues */
+function formatDate(dateStr: string): string {
+  const parts = dateStr.split('-')
+  return `${parts[2]}/${parts[1]}`
+}
+
+/** Compare date-only strings "YYYY-MM-DD" with today */
+function isDateFuture(dateStr: string): boolean {
+  const today = new Date()
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  return dateStr > todayStr
 }
 
 export default function ProductCard({ product, onClick }: Props) {
   const { addItem, openCart } = useCart()
-  const outOfStock = product.stock === 0
-  const isFuture = product.available_from
-    ? new Date(product.available_from) > new Date()
-    : false
+  const isFuture = product.available_from ? isDateFuture(product.available_from) : false
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.stopPropagation()
-    if (outOfStock || isFuture) return
     addItem(product, product.sizes[0] ?? '', product.colors[0] ?? '')
     openCart()
   }
 
-  const isDisabled = outOfStock || isFuture
-
   return (
     <div
-      onClick={isDisabled ? undefined : onClick}
+      onClick={isFuture ? undefined : onClick}
       className="group bg-white rounded-2xl overflow-hidden border border-[#F0D4DC] text-left transition-all duration-200 hover:border-[#C85880] hover:shadow-md relative"
       style={{
-        opacity: outOfStock ? 0.6 : 1,
-        pointerEvents: isDisabled ? 'none' : 'auto',
-        cursor: isDisabled ? 'default' : 'pointer',
+        pointerEvents: isFuture ? 'none' : 'auto',
+        cursor: isFuture ? 'default' : 'pointer',
       }}
     >
-      {/* Image — 280px fixed, contain */}
-      <div className="w-full overflow-hidden flex items-center justify-center relative" style={{ height: 280, background: '#FFF8FA' }}>
+      {/* Image */}
+      <div
+        className="w-full overflow-hidden flex items-center justify-center relative"
+        style={{ height: 280, background: isFuture ? '#F5F0FA' : '#FFF8FA' }}
+      >
         {product.image_urls?.[0] ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={product.image_urls[0]}
             alt={product.name}
             className="w-full h-full transition-transform duration-300 group-hover:scale-105"
-            style={{ objectFit: 'contain' }}
+            style={{
+              objectFit: 'contain',
+              filter: isFuture ? 'blur(1.5px)' : 'none',
+            }}
           />
         ) : (
-          <span className="text-5xl transition-transform duration-300 group-hover:scale-105">👗</span>
+          <span
+            className="text-5xl transition-transform duration-300 group-hover:scale-105"
+            style={{ filter: isFuture ? 'blur(1.5px)' : 'none' }}
+          >
+            👗
+          </span>
         )}
-        {outOfStock && (
-          <div className="absolute inset-0 flex items-start justify-end p-2">
-            <span className="text-[10px] font-bold bg-red-500 text-white uppercase tracking-wider px-2 py-0.5 rounded-full">
-              Agotado
-            </span>
-          </div>
-        )}
+
+        {/* Future badge — centered overlay */}
         {isFuture && product.available_from && (
-          <div className="absolute inset-0 flex items-start justify-end p-2">
-            <span className="text-[10px] font-bold bg-[#C85880] text-white px-2 py-0.5 rounded-full">
-              Disponible el {formatAvailableDate(product.available_from)}
-            </span>
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+            style={{ pointerEvents: 'none' }}
+          >
+            <div
+              style={{
+                background: '#C85880',
+                borderRadius: 12,
+                padding: '8px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.8)',
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  lineHeight: 1,
+                }}
+              >
+                disponible el
+              </span>
+              <span
+                style={{
+                  fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
+                  fontSize: 26,
+                  fontWeight: 700,
+                  color: '#ffffff',
+                  lineHeight: 1.1,
+                }}
+              >
+                {formatDate(product.available_from)}
+              </span>
+            </div>
           </div>
         )}
       </div>
@@ -134,8 +175,32 @@ export default function ProductCard({ product, onClick }: Props) {
 
       </div>
 
-      {/* Quick-add button — absolute bottom-right */}
-      {product.stock > 0 && !isFuture && (
+      {/* Quick-add button OR próximamente pill */}
+      {isFuture ? (
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 12,
+            right: 12,
+            background: '#F5F0FA',
+            border: '1px solid #E0D0EC',
+            borderRadius: 999,
+            padding: '4px 10px',
+          }}
+        >
+          <span
+            style={{
+              fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
+              fontSize: 10,
+              fontWeight: 700,
+              color: '#9B7EC0',
+              letterSpacing: '0.04em',
+            }}
+          >
+            próximamente
+          </span>
+        </div>
+      ) : (
         <button
           onClick={handleQuickAdd}
           aria-label="Agregar al carrito"
