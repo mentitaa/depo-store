@@ -46,6 +46,7 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
   onCancelEdit?: () => void
 }) {
   const fileRef = useRef<HTMLInputElement>(null)
+  const catScrollRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [formError, setFormError] = useState('')
@@ -278,23 +279,45 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
           />
         </div>
 
-        {/* Categories — checkboxes */}
+        {/* Categories — horizontal scroll */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs text-[#180A10]/50 font-medium">Categoría</label>
-          <div className="flex gap-2">
-            {CATEGORIES.map(c => (
-              <button
-                key={c} type="button"
-                onClick={() => setCategories(prev => toggle(prev, c))}
-                className={`px-3 py-1.5 rounded-lg border text-sm transition-colors ${
-                  categories.includes(c)
-                    ? 'border-[#C85880] bg-[#C85880] text-white'
-                    : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
-                }`}
-              >
-                {c.charAt(0).toUpperCase() + c.slice(1)}
-              </button>
-            ))}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => catScrollRef.current?.scrollBy({ left: -120, behavior: 'smooth' })}
+              className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full border border-[#F0D4DC] text-[#180A10]/50 hover:border-[#C85880] hover:text-[#C85880] transition-colors text-sm leading-none"
+            >‹</button>
+            <div
+              ref={catScrollRef}
+              style={{
+                display: 'flex',
+                gap: 8,
+                overflowX: 'auto',
+                scrollSnapType: 'x mandatory',
+                scrollbarWidth: 'none',
+              } as React.CSSProperties}
+            >
+              {CATEGORIES.map(c => (
+                <button
+                  key={c} type="button"
+                  onClick={() => setCategories(prev => toggle(prev, c))}
+                  style={{ flexShrink: 0, scrollSnapAlign: 'start' }}
+                  className={`px-3 py-1.5 rounded-lg border text-sm transition-colors ${
+                    categories.includes(c)
+                      ? 'border-[#C85880] bg-[#C85880] text-white'
+                      : 'border-[#F0D4DC] text-[#180A10] hover:border-[#C85880]'
+                  }`}
+                >
+                  {c.charAt(0).toUpperCase() + c.slice(1)}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => catScrollRef.current?.scrollBy({ left: 120, behavior: 'smooth' })}
+              className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full border border-[#F0D4DC] text-[#180A10]/50 hover:border-[#C85880] hover:text-[#C85880] transition-colors text-sm leading-none"
+            >›</button>
           </div>
         </div>
 

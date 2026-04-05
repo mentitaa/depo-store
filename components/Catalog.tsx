@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { SlidersHorizontal } from 'lucide-react'
 import type { Product, CategoryFilter } from '@/lib/types'
 import ProductCard from './ProductCard'
@@ -15,6 +15,13 @@ const CATEGORIES: { label: string; value: CategoryFilter }[] = [
   { label: 'Accesorios', value: 'accesorios' },
 ]
 
+type SortValue = 'recientes' | 'precio-asc' | 'precio-desc'
+const SORT_OPTIONS: { label: string; value: SortValue }[] = [
+  { label: 'Más recientes', value: 'recientes' },
+  { label: 'Precio: menor a mayor ↑', value: 'precio-asc' },
+  { label: 'Precio: mayor a menor ↓', value: 'precio-desc' },
+]
+
 interface Props {
   initialProducts?: Product[]
 }
@@ -24,6 +31,19 @@ export default function Catalog({ initialProducts = [] }: Props) {
   const [filters, setFilters] = useState<FilterValues>({ sizes: [], colors: [] })
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [showFilters, setShowFilters] = useState(false)
+  const [sortBy, setSortBy] = useState<SortValue>('recientes')
+  const [sortOpen, setSortOpen] = useState(false)
+  const sortRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (sortRef.current && !sortRef.current.contains(e.target as Node)) {
+        setSortOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   const filtered = initialProducts.filter(p => {
     if (p.stock === 0) return false
@@ -38,7 +58,14 @@ export default function Catalog({ initialProducts = [] }: Props) {
     return true
   })
 
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === 'precio-asc') return a.price - b.price
+    if (sortBy === 'precio-desc') return b.price - a.price
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  })
+
   const hasActiveFilters = filters.sizes.length > 0 || filters.colors.length > 0
+  const activeSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)!.label
 
   const MONO = 'ui-monospace, "Cascadia Code", "Fira Code", monospace'
 
@@ -128,13 +155,13 @@ export default function Catalog({ initialProducts = [] }: Props) {
           </button>
         </div>
 
-        {/* Category buttons */}
+        {/* Category buttons + sort */}
         <div
           style={{
             padding: '12px 16px',
             display: 'flex',
             gap: 8,
-            flexWrap: 'wrap' as const,
+            alignItems: 'center',
             borderBottom: '1px solid #F0D4DC',
             background: '#ffffff',
           }}
@@ -154,18 +181,80 @@ export default function Catalog({ initialProducts = [] }: Props) {
                 color: activeCategory === cat.value ? '#ffffff' : '#180A10',
                 cursor: 'pointer',
                 transition: 'all 0.15s',
+                flexShrink: 0,
               }}
             >
               {cat.label.toLowerCase()}
             </button>
           ))}
+
+          {/* Sort dropdown */}
+          <div ref={sortRef} style={{ marginLeft: 'auto', position: 'relative', flexShrink: 0 }}>
+            <button
+              onClick={() => setSortOpen(o => !o)}
+              style={{
+                fontFamily: MONO,
+                fontSize: 11,
+                fontWeight: 400,
+                color: '#888',
+                background: '#ffffff',
+                border: '0.5px solid #F0D4DC',
+                borderRadius: 6,
+                padding: '5px 10px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {activeSortLabel}
+            </button>
+            {sortOpen && (
+              <div
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  top: 'calc(100% + 4px)',
+                  background: '#ffffff',
+                  border: '1px solid #F0D4DC',
+                  borderRadius: 8,
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+                  zIndex: 20,
+                  minWidth: 190,
+                  overflow: 'hidden',
+                }}
+              >
+                {SORT_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => { setSortBy(opt.value); setSortOpen(false) }}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      textAlign: 'left',
+                      fontFamily: MONO,
+                      fontSize: 11,
+                      fontWeight: opt.value === sortBy ? 700 : 400,
+                      color: opt.value === sortBy ? '#C85880' : '#180A10',
+                      background: opt.value === sortBy ? '#FFF8FA' : '#ffffff',
+                      border: 'none',
+                      padding: '9px 14px',
+                      cursor: 'pointer',
+                    }}
+                    onMouseOver={e => { if (opt.value !== sortBy) (e.currentTarget as HTMLButtonElement).style.background = '#FFF8FA' }}
+                    onMouseOut={e => { if (opt.value !== sortBy) (e.currentTarget as HTMLButtonElement).style.background = '#ffffff' }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Grid */}
         <div style={{ padding: '16px', background: '#ffffff' }}>
-          {filtered.length > 0 ? (
+          {sorted.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
-              {filtered.map(product => (
+              {sorted.map(product => (
                 <ProductCard
                   key={product.id}
                   product={product}
