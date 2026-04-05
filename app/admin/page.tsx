@@ -53,6 +53,9 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
     name: editing?.name ?? '',
     price: editing?.price?.toString() ?? '',
     stock: editing?.stock?.toString() ?? '1',
+    availableFrom: editing?.available_from
+      ? new Date(editing.available_from).toISOString().slice(0, 16)
+      : '',
   })
   const [categories, setCategories] = useState<string[]>(() => normalizeCats(editing?.category))
   const [sizes, setSizes] = useState<string[]>(editing?.sizes ?? [])
@@ -133,6 +136,7 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
         stock: parseInt(form.stock),
         sizes,
         colors,
+        available_from: form.availableFrom ? new Date(form.availableFrom).toISOString() : null,
       }
       console.log('[Admin] Payload completo a enviar:', JSON.stringify(payload, null, 2))
       console.log('[Admin] colors tipo:', typeof payload.colors, '| valor:', payload.colors)
@@ -148,7 +152,7 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
       console.log('[Admin] Guardado exitoso')
 
       // Reset form
-      setForm({ name: '', price: '', stock: '1' })
+      setForm({ name: '', price: '', stock: '1', availableFrom: '' })
       setCategories([])
       setSizes([])
       setColors([])
@@ -314,6 +318,28 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
             onChange={e => setForm(p => ({ ...p, stock: e.target.value }))}
             className="px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA]"
           />
+        </div>
+
+        {/* Available from */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-[#180A10]/50 font-medium">
+            Disponible desde <span className="text-[#180A10]/30 font-normal">(opcional)</span>
+          </label>
+          <input
+            type="datetime-local"
+            value={form.availableFrom}
+            onChange={e => setForm(p => ({ ...p, availableFrom: e.target.value }))}
+            className="px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA] text-[#180A10]"
+          />
+          {form.availableFrom && (
+            <button
+              type="button"
+              onClick={() => setForm(p => ({ ...p, availableFrom: '' }))}
+              className="self-start text-[10px] text-[#180A10]/40 hover:text-[#C85880] transition-colors"
+            >
+              Borrar fecha
+            </button>
+          )}
         </div>
 
         {/* Sizes */}

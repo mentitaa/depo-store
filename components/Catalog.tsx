@@ -25,6 +25,7 @@ export default function Catalog({ initialProducts = [] }: Props) {
   const [showFilters, setShowFilters] = useState(false)
 
   const filtered = initialProducts.filter(p => {
+    if (p.stock === 0) return false
     const cats = Array.isArray(p.category)
       ? p.category
       : typeof p.category === 'string' && (p.category as string).startsWith('[')

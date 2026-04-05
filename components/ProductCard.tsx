@@ -8,25 +8,37 @@ interface Props {
   onClick: () => void
 }
 
+function formatAvailableDate(iso: string): string {
+  const d = new Date(iso)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  return `${day}/${month}`
+}
+
 export default function ProductCard({ product, onClick }: Props) {
   const { addItem, openCart } = useCart()
   const outOfStock = product.stock === 0
+  const isFuture = product.available_from
+    ? new Date(product.available_from) > new Date()
+    : false
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.stopPropagation()
-    if (outOfStock) return
+    if (outOfStock || isFuture) return
     addItem(product, product.sizes[0] ?? '', product.colors[0] ?? '')
     openCart()
   }
 
+  const isDisabled = outOfStock || isFuture
+
   return (
     <div
-      onClick={outOfStock ? undefined : onClick}
+      onClick={isDisabled ? undefined : onClick}
       className="group bg-white rounded-2xl overflow-hidden border border-[#F0D4DC] text-left transition-all duration-200 hover:border-[#C85880] hover:shadow-md relative"
       style={{
         opacity: outOfStock ? 0.6 : 1,
-        pointerEvents: outOfStock ? 'none' : 'auto',
-        cursor: outOfStock ? 'default' : 'pointer',
+        pointerEvents: isDisabled ? 'none' : 'auto',
+        cursor: isDisabled ? 'default' : 'pointer',
       }}
     >
       {/* Image — 280px fixed, contain */}
@@ -46,6 +58,13 @@ export default function ProductCard({ product, onClick }: Props) {
           <div className="absolute inset-0 flex items-start justify-end p-2">
             <span className="text-[10px] font-bold bg-red-500 text-white uppercase tracking-wider px-2 py-0.5 rounded-full">
               Agotado
+            </span>
+          </div>
+        )}
+        {isFuture && product.available_from && (
+          <div className="absolute inset-0 flex items-start justify-end p-2">
+            <span className="text-[10px] font-bold bg-[#C85880] text-white px-2 py-0.5 rounded-full">
+              Disponible el {formatAvailableDate(product.available_from)}
             </span>
           </div>
         )}
@@ -116,7 +135,7 @@ export default function ProductCard({ product, onClick }: Props) {
       </div>
 
       {/* Quick-add button — absolute bottom-right */}
-      {product.stock > 0 && (
+      {product.stock > 0 && !isFuture && (
         <button
           onClick={handleQuickAdd}
           aria-label="Agregar al carrito"
