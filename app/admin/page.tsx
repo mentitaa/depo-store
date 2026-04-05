@@ -349,21 +349,24 @@ function AddProductForm({ onAdded, editing, onCancelEdit }: {
           <label className="text-xs text-[#180A10]/50 font-medium">
             Disponible desde <span className="text-[#180A10]/30 font-normal">(opcional)</span>
           </label>
-          <input
-            type="date"
-            value={form.availableFrom}
-            onChange={e => setForm(p => ({ ...p, availableFrom: e.target.value }))}
-            className="px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA] text-[#180A10]"
-          />
-          {form.availableFrom && (
-            <button
-              type="button"
-              onClick={() => setForm(p => ({ ...p, availableFrom: '' }))}
-              className="self-start text-[10px] text-[#180A10]/40 hover:text-[#C85880] transition-colors"
-            >
-              Borrar fecha
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            <input
+              type="date"
+              value={form.availableFrom}
+              onChange={e => setForm(p => ({ ...p, availableFrom: e.target.value }))}
+              className="flex-1 px-3 py-2 rounded-xl border border-[#F0D4DC] text-sm focus:outline-none focus:border-[#C85880] bg-[#FFF8FA] text-[#180A10]"
+            />
+            {form.availableFrom && (
+              <button
+                type="button"
+                onClick={() => setForm(p => ({ ...p, availableFrom: '' }))}
+                title="Quitar fecha"
+                className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full border border-[#F0D4DC] text-[#180A10]/40 hover:border-[#C85880] hover:text-[#C85880] transition-colors text-sm"
+              >
+                ✕
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Sizes */}
