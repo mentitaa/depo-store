@@ -853,6 +853,18 @@ export default function AdminPage() {
                         ) : (
                           <span className="text-[9px] font-bold bg-[#F0D4DC] text-[#C85880] px-1.5 py-0.5 rounded-full flex-shrink-0">stock: {p.stock}</span>
                         )}
+                        {p.available_from && (() => {
+                          const d = new Date(p.available_from)
+                          const today = new Date(); today.setUTCHours(0,0,0,0)
+                          if (d <= today) return null
+                          const day = String(d.getUTCDate()).padStart(2,'0')
+                          const month = String(d.getUTCMonth()+1).padStart(2,'0')
+                          return (
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full flex-shrink-0" style={{ background: '#F5F0FA', color: '#9B7EC0', border: '1px solid #E0D0EC' }}>
+                              {day}/{month}
+                            </span>
+                          )
+                        })()}
                       </div>
                       <p className="text-xs text-[#C85880] font-bold">S/ {p.price.toFixed(2)}</p>
                       <p className="text-[10px] text-[#180A10]/40">{normalizeCats(p.category).join(', ')}</p>

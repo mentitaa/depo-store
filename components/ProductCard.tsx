@@ -8,10 +8,11 @@ interface Props {
   onClick: () => void
 }
 
-/** Parse "YYYY-MM-DD" → "dd/mm" without timezone issues */
-function formatDate(dateStr: string): string {
-  const parts = dateStr.split('-')
-  return `${parts[2]}/${parts[1]}`
+function formatDate(available_from: string): string {
+  const date = new Date(available_from)
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  return `${day}/${month}`
 }
 
 /** Compare date-only strings "YYYY-MM-DD" with today */
@@ -186,6 +187,10 @@ export default function ProductCard({ product, onClick }: Props) {
             border: '1px solid #E0D0EC',
             borderRadius: 999,
             padding: '4px 10px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
           }}
         >
           <span
